@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-body-tertiary rounded-3">
+    <div class="container-fluid py-5 d-flex flex-column gap-3 align-items-center">
+        <h1 class="display-5 fw-bold">Whereto today, traveller?</h1>
+        <form action="/search" method="get" class="col-12 col-md-8 d-flex flex-column gap-3">
+            <div class="form-floating">
+                <input name="origin" id="origin" type="text" class="form-control form-control-lg" />
+                <label for="origin">From</label>
+            </div>
+            <div class="form-floating">
+                <input name="dest" id="dest" type="text" class="form-control form-control-lg" />
+                <label for="dest">To</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg text-nowrap mx-auto"><i class="bi bi-search"></i> Find Flights!</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,37 @@
+<header class="container">
+    <div class="pb-3 mb-3 border-bottom">
+        <nav class="navbar p-0 navbar-expand-sm">
+            <a href="/" class="navbar-brand fs-4 text-body-emphasis text-decoration-none"><i
+                    class="bi bi-airplane-fill"></i> UoG
+                Flights</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-links"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar-links">
+                <ul class="navbar-nav ms-auto">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('root.index') }}">stuff</a>
+                    </li> -->
+                    {% if g.user %}
+                    <li class="nav-item dropdown">
+                        <span class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ g.user.username }}</span>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Log Out</a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>
