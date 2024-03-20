@@ -107,24 +107,28 @@ def dfs(graph, origin, destination, max_layovers, path, response_data, visited=N
     visited.remove(origin)
     return routes
 
-# Print flight routes with their total distances
+# Print flight routes with their total distances, sorted by cheapest flight
 def print_flight_routes(direct_route, routes, response_data):
-    if direct_route:
-        print("Direct Flight Route from", origin, "to", destination)
-        print(f"Route: {direct_route}")
-        total_distance = calculate_distance(*airports[origin]['coords'], *airports[destination]['coords'])
-        total_price = get_flight_prices(origin, destination, response_data)
-        print(f"Total Distance: {total_distance} km")
-        print(f"Total Price (SGD): {total_price}")
-        print()
 
-    print("Indirect Flight Routes from", origin, "to", destination)
+    #Direct Flight  
+    print("Routes from", origin, "to", destination)
+    print(f"{direct_route}")
+    total_distance = calculate_distance(*airports[origin]['coords'], *airports[destination]['coords'])
+    total_price = get_flight_prices(origin, destination, response_data)
+    print(f"Total Distance: {round(total_distance, 2)} km")
+    print(f"Total Price (SGD): {round(total_price, 2)}")
+    print()
+
+    # Sort routes by total price
+    routes.sort(key=lambda route: sum(get_flight_prices(route[j], route[j+1], response_data) for j in range(len(route) - 1)))
+
+    #Layover Flights
     for i, route in enumerate(routes[:10], start=1):  # Limit to only 10 routes
         total_distance = sum(calculate_distance(*airports[route[j]]['coords'], *airports[route[j+1]]['coords']) for j in range(len(route) - 1))
         total_price = sum(get_flight_prices(route[j], route[j+1], response_data) for j in range(len(route) - 1))
-        print(f"Route {i}: {route}")
-        print(f"Total Distance: {total_distance} km")
-        print(f"Total Price (SGD): {total_price}")
+        print(f"{route}")
+        print(f"Total Distance: {round(total_distance, 2)} km")
+        print(f"Total Price (SGD): {round(total_price, 2)}")
         print()
 
 # User input for origin and destination
@@ -139,7 +143,7 @@ graph = construct_graph(airports)
 # User input for origin and destination
 origin = input("Enter origin IATA code: ")
 destination = input("Enter destination IATA code: ")
-date = input("Enter deprature date (YYYY-MM-DD): ")
+date = input("Enter departure date (YYYY-MM-DD): ")
 
 # Retrieve flight data for the given origin-destination pair
 response = amadeus.shopping.flight_offers_search.get(
@@ -149,7 +153,7 @@ response = amadeus.shopping.flight_offers_search.get(
     adults=1,
     currencyCode='SGD',
     nonStop='false',
-    max = 50
+    max=50
 )
 
 response_data = response.data
