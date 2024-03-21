@@ -2,6 +2,7 @@ import heapq
 from amadeus import Client
 import csv
 import math
+import datetime
 
 # Initialize Amadeus client
 amadeus = Client(
@@ -105,7 +106,6 @@ def check_flight_offer(origin, destination, response_data):
     return False
 
 # DFS algorithm to generate possible flight routes including layover flights
-# DFS algorithm to generate possible flight routes including layover flights
 def dfs(graph, origin, destination, max_layovers, path, response_data, visited=None):
     if visited is None:
         visited = set()
@@ -135,14 +135,16 @@ def dfs(graph, origin, destination, max_layovers, path, response_data, visited=N
     visited.remove(origin)
     return routes
 
-# Print flight routes with their total distances, sorted by cheapest flight
+# Handles the flight routes with their total distances, sorted by cheapest flight
 def print_flight_routes(graph, direct_route, routes, response_data, airports, origin, destination):
     printed_routes = set()  # Set to store printed routes
+    direct_data = []
+    indirect_data = []
+
     if direct_route:
-        print("Direct Flight:")
         # Sort direct routes by total price
         direct_route.sort(key=lambda route: get_flight_prices(route[0], route[1], response_data))
-        print_route_info(direct_route, response_data, graph, printed_routes)
+        direct_data = print_route_info(direct_route, response_data, graph, printed_routes)
         print()
     elif routes:
         # Sort indirect routes by total price
@@ -152,14 +154,22 @@ def print_flight_routes(graph, direct_route, routes, response_data, airports, or
             if len(route) == 2:  # Check if it's a direct flight route
                 continue
             else:
-                print_route_info(route, response_data, graph, printed_routes)
+                indirect_flight_info = print_route_info(route, response_data, graph, printed_routes)
+                if indirect_flight_info:  # Check if the route was printed
+                    indirect_data.extend(indirect_flight_info)
                 print()
     else:
         print("No flight routes available.")
+    
+    return direct_data, indirect_data
 
+# Handles each flight information, calculating the total distance and retrieving associated airline and total price
 def print_route_info(route_data, response_data, graph, printed_routes):
     total_distance = sum(dijkstra(graph, route_data[j], route_data[j+1]) for j in range(len(route_data) - 1))
     route_tuple = tuple(route_data)
+    direct_flights_data = []
+    indirect_flights_data = []
+
     if route_tuple not in printed_routes:  # Check if route has been printed before
         printed_routes.add(route_tuple)  # Add route to printed routes set
 
@@ -182,9 +192,11 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                         print(f"Airline: {segment[2]}")
                         print(f"Total Price (SGD): {segment[3]}")
                         print()
+                        direct_flights_data.append(([origin, destination], round(total_distance, 2), segment[2], segment[3]))
+            return direct_flights_data
 
         # Indirect flight        
-        else: 
+        elif len(route_data) > 2:
             for i in range(len(route_data) - 1):
                 origin, destination = route_data[i], route_data[i+1]
                 for segment in sorted_segments:
@@ -193,13 +205,13 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                         print(f"Total Distance: {round(total_distance, 2)} km")
                         print(f"Airline: {segment[2]}")
                         print(f"Total Price (SGD): {segment[3]}")
-                        print()
-                        return  # Exit the loop after printing one route
+                        indirect_flights_data.append((route_data, round(total_distance, 2), segment[2], segment[3]))
+                        return indirect_flights_data
 
-
+#Main function
 def main():
     # User input for origin and destination
-    filename = 'airports_Asia.csv'
+    filename = 'data/airports_Asia.csv'
 
     # Read airports with their latitude and longitude coordinates and country
     airports = read_airports_from_csv(filename)
@@ -207,16 +219,40 @@ def main():
     # Construct the graph based on the distances between airports and their countries
     graph = construct_graph(airports)
 
-    # User input for origin and destination
-    origin = input("Enter origin IATA code: ")
-    destination = input("Enter destination IATA code: ")
-    date = input("Enter departure date (YYYY-MM-DD): ")
+    # Prompt user to enter valid origin IATA code
+    while True:
+        origin = input("Enter origin IATA code: ").upper()
+        if origin in airports:
+            break
+        else:
+            print("Invalid IATA code. Please try again.")
+
+    # Prompt user to enter valid destination IATA code
+    while True:
+        destination = input("Enter destination IATA code: ").upper()
+        if destination in airports:
+            break
+        else:
+            print("Invalid IATA code. Please try again.")
+
+    # Prompt user to enter a valid departure date (current or future dates)
+    while True:
+        date_str = input("Enter departure date (YYYY-MM-DD): ")
+        try:
+            date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+            current_date = datetime.datetime.now().date()
+            if date >= current_date:
+                break
+            else:
+                print("Invalid date. Please enter a current or future date.")
+        except ValueError:
+            print("Invalid date format. Please enter date in YYYY-MM-DD format.")
 
     # Retrieve flight data for the given origin-destination pair
     response = amadeus.shopping.flight_offers_search.get(
         originLocationCode=origin,
         destinationLocationCode=destination,
-        departureDate=date,
+        departureDate=date_str,
         adults=1,
         currencyCode='SGD',
         nonStop='false',
@@ -236,6 +272,7 @@ def main():
             if selection == "yes":
                 if direct_route:
                     print_flight_routes(graph, direct_route, [], response_data, airports, origin, destination)
+                    break
                 else:
                     print("No direct flight available.")
                 break
