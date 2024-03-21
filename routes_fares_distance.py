@@ -146,7 +146,7 @@ def print_flight_routes(graph, direct_route, routes, response_data, airports, or
         print()
     elif routes:
         # Sort indirect routes by total price
-        routes.sort(key=lambda route: sum(get_flight_prices(route[j], route[j+1], response_data) for j in range(len(route) - 1)))
+        routes.sort(key=lambda route: min(get_flight_prices(route[j], route[j+1], response_data) for j in range(len(route) - 1)))
 
         for i, route in enumerate(routes[:10], start=1):  # Limit to only 10 routes
             if len(route) == 2:  # Check if it's a direct flight route
