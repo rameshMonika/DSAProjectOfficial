@@ -181,9 +181,10 @@ def print_route_info(route_data, response_data, graph, printed_routes):
         else:  # Indirect flight
             for i in range(len(route_data) - 1):
                 origin, destination = route_data[i], route_data[i+1]
+                modifiedRouteData=route_data[:-1]
                 for segment in unique_segments:
                     if segment[0] == origin and segment[1] == destination:
-                        print(f"Route: {route_data}")
+                        print(f"Route: {modifiedRouteData}")
                         print(f"Total Distance: {round(total_distance, 2)} km")
                         print(f"Airline: {segment[2]}")
                         print(f"Total Price (SGD): {segment[3]}")
@@ -192,7 +193,7 @@ def print_route_info(route_data, response_data, graph, printed_routes):
 
 def main():
     # User input for origin and destination
-    filename = 'airports_Asia.csv'
+    filename = 'data/airports_Asia.csv'
 
     # Read airports with their latitude and longitude coordinates and country
     airports = read_airports_from_csv(filename)
