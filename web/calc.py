@@ -1,4 +1,3 @@
-<<<<<<< HEAD:web/calc.py
 import pandas as pd
 from geopy.distance import geodesic
 
@@ -9,7 +8,7 @@ airports = pd.read_csv('data/airports.csv', names=airports_cols, header=None, in
 routes = pd.read_csv('data/routes.csv', names=routes_cols, header=None, index_col=None, na_values='\\N')
 source_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Source airport'})
 destination_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Destination airport'})
-=======
+
 from flask import Flask, request, jsonify,render_template
 import csv
 import math
@@ -22,9 +21,6 @@ amadeus = Client(
     client_id='BxsFW8YgIcfqCGSiwk1GPvcJnttW266T',
     client_secret='WnFBmc33acG9bWHf'
 )
->>>>>>> 0965bdd2fa2aebae9c26cf57a58cf9f3ee44327e:a.py
-
-
 
 
 def get_flight_offers(origin, destination):
