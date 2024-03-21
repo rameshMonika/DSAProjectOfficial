@@ -2,6 +2,7 @@ from amadeus import Client, ResponseError
 from datetime import datetime
 import csv
 import math
+import heapq
 
 # Initialize Amadeus client
 amadeus = Client(
@@ -49,17 +50,15 @@ def construct_graph(airports):
     graph = {}
     for origin_iata, origin_data in airports.items():
         origin_country = origin_data['country']
-        connections = []
+        connections = {}  # Change from list to dictionary
         for dest_iata, dest_data in airports.items():
             if origin_iata != dest_iata and origin_country != dest_data['country']:
                 # Calculate distance between airports
                 origin_coords = origin_data['coords']
                 dest_coords = dest_data['coords']
                 distance = calculate_distance(origin_coords[0], origin_coords[1], dest_coords[0], dest_coords[1])
-                connections.append((dest_iata, distance))  # Store destination and its distance
-        # Sort connections based on distance
-        connections.sort(key=lambda x: x[1])  # Sort based on distance
-        graph[origin_iata] = [conn[0] for conn in connections]  # Store only the airport IATA codes
+                connections[dest_iata] = distance  # Store destination and its distance
+        graph[origin_iata] = connections
     return graph
 
 # Retrieve flight prices for a given route
@@ -127,8 +126,64 @@ def print_flight_routes(direct_route, routes, response_data):
         print(f"Total Price (SGD): {total_price}")
         print()
 
+
+# Dijkstra's algorithm to find shortest path in terms of distance
+def dijkstra(graph, origin, destination):
+    distances = {airport: float('inf') for airport in graph}
+    distances[origin] = 0
+    previous = {airport: None for airport in graph}
+    priority_queue = [(0, origin)]
+
+    while priority_queue:
+        current_distance, current_airport = heapq.heappop(priority_queue)
+
+        if current_distance > distances[current_airport]:
+            continue
+
+        for neighbor in graph[current_airport]:
+            distance = current_distance + graph[current_airport][neighbor]
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                previous[neighbor] = current_airport
+                heapq.heappush(priority_queue, (distance, neighbor))
+
+    path = []
+    airport = destination
+    while airport:
+        path.append(airport)
+        airport = previous[airport]
+
+    return path[::-1], distances[destination]
+
+# Method to get the most optimal route considering both cost and distance
+def get_optimal_route(graph, origin, destination, response_data):
+    # Use Dijkstra's algorithm to find the shortest path in terms of distance
+    shortest_path, shortest_distance = dijkstra(graph, origin, destination)
+
+    # Initialize variables to store optimal route and its total cost
+    optimal_route = None
+    min_cost = float('inf')
+
+    # Iterate through each possible route
+    for i in range(len(shortest_path) - 1):
+        current_origin = shortest_path[i]
+        current_destination = shortest_path[i + 1]
+
+        # Check if flight offer exists for the current route segment
+        if check_flight_offer(current_origin, current_destination, response_data):
+            # Calculate total cost for the current route
+            total_cost = sum(get_flight_prices(current_origin, current_destination, response_data) 
+                             for current_origin, current_destination in zip(shortest_path, shortest_path[1:]))
+
+            # Update optimal route if total cost is lower than current minimum cost
+            if total_cost < min_cost:
+                optimal_route = shortest_path[i:i + 2]
+                min_cost = total_cost
+
+    return optimal_route, min_cost
+
 # User input for origin and destination
-filename = 'airports_Asia.csv'
+filename = 'data/airports_Asia.csv'
 
 # Read airports with their latitude and longitude coordinates and country
 airports = read_airports_from_csv(filename)
@@ -162,10 +217,21 @@ if response_data:
     # Check for direct flight
     direct_route = [origin, destination] if destination in graph.get(origin, []) else None
     
+
     # Use DFS to generate flight routes
     routes = dfs(graph, origin, destination, 2, [origin], response_data)
 
     # Print flight routes
     print_flight_routes(direct_route, routes, response_data)
+    
+    # Calling the function to get the optimal route
+    optimal_route, min_cost = get_optimal_route(graph, origin, destination, response_data)
+    if optimal_route:
+        print("Most Optimal Flight Route from", origin, "to", destination)
+        print(f"Optimal Route: {optimal_route}")
+        print(f"Total Cost (SGD): {min_cost}")
+    else:
+        print("No optimal route found.")
+        
 else:
     print("No flight data available.")
