@@ -4,7 +4,7 @@ from geopy.distance import geodesic
 # Read data
 airports_cols = ['Airport ID','City', 'Country', 'IATA', 'ICAO', 'Latitude', 'Longitude', 'Altitude', 'Timezone', 'DST', 'Tz database time zone', 'Type', 'Source']
 routes_cols = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'Destination airport', 'Destination airport ID', 'Codeshare', 'Stops', 'Equipment']
-airports = pd.read_csv('data/airports.csv', names=airports_cols, header=None, index_col=None, na_values='\\N')
+airports = pd.read_csv('data/airports_Asia.csv', names=airports_cols, header=None, index_col=None, na_values='\\N')
 routes = pd.read_csv('data/routes.csv', names=routes_cols, header=None, index_col=None, na_values='\\N')
 source_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Source airport'})
 destination_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Destination airport'})
@@ -164,14 +164,11 @@ def get_flight_routes(origin, destination, max_layovers, airports):
         else:
             return []
 
-
-
-<<<<<<< HEAD:web/calc.py
 def get_route(src: str, dest: str):
     result = routes_with_coordinates[(routes_with_coordinates['Source airport'] == src) & (routes_with_coordinates['Destination airport'] == dest)]
     # Replace NaN values with None before converting to JSON
     return result.where(pd.notnull(result), None).to_dict(orient='records')
-=======
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -199,4 +196,3 @@ def get_route():
 
 if __name__ == '__main__':
     app.run(debug=True)
->>>>>>> 0965bdd2fa2aebae9c26cf57a58cf9f3ee44327e:a.py
