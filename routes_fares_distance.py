@@ -105,6 +105,7 @@ def check_flight_offer(origin, destination, response_data):
     return False
 
 # DFS algorithm to generate possible flight routes including layover flights
+# DFS algorithm to generate possible flight routes including layover flights
 def dfs(graph, origin, destination, max_layovers, path, response_data, visited=None):
     if visited is None:
         visited = set()
@@ -122,39 +123,39 @@ def dfs(graph, origin, destination, max_layovers, path, response_data, visited=N
         if neighbor not in visited:
             new_route = path + [neighbor]
             if check_flight_offer(origin, neighbor, response_data):
+                # Only append destination if there's a valid flight offer
                 if check_flight_offer(neighbor, destination, response_data):
-                    routes.extend(dfs(graph, neighbor, destination, max_layovers, new_route, response_data, visited))
+                    updated_routes = dfs(graph, neighbor, destination, max_layovers, new_route, response_data, visited)
+                    routes.extend(updated_routes)
                 else:
-                    new_route.append(destination)
-                    routes.append(new_route)
+                    # Check if the current neighbor is the destination airport
+                    if neighbor == destination:
+                        routes.append(new_route)
 
     visited.remove(origin)
     return routes
-
-def get_route_info(route_data, response_data, graph):
-    total_distance = sum(dijkstra(graph, route_data[j], route_data[j+1]) for j in range(len(route_data) - 1))
-    airlines = set()
-    total_price = 0
-    for itinerary in response_data:
-        for segment in itinerary['itineraries'][0]['segments']:
-            airlines.add(segment['carrierCode'])
-            total_price += float(itinerary['price']['total'])
-    return total_distance, airlines, total_price
 
 # Print flight routes with their total distances, sorted by cheapest flight
 def print_flight_routes(graph, direct_route, routes, response_data, airports, origin, destination):
     printed_routes = set()  # Set to store printed routes
     if direct_route:
         print("Direct Flight:")
+        # Sort direct routes by total price
+        direct_route.sort(key=lambda route: get_flight_prices(route[0], route[1], response_data))
         print_route_info(direct_route, response_data, graph, printed_routes)
         print()
     elif routes:
-        # Sort routes by total price
-        routes.sort(key=lambda route: sum(dijkstra(graph, route[j], route[j+1]) for j in range(len(route) - 1)))
+        # Sort indirect routes by total price
+        routes.sort(key=lambda route: sum(get_flight_prices(route[j], route[j+1], response_data) for j in range(len(route) - 1)))
 
         for i, route in enumerate(routes[:10], start=1):  # Limit to only 10 routes
-            print_route_info(route, response_data, graph, printed_routes)
-            print()
+            if len(route) == 2:  # Check if it's a direct flight route
+                continue
+            else:
+                print_route_info(route, response_data, graph, printed_routes)
+                print()
+    else:
+        print("No flight routes available.")
 
 def print_route_info(route_data, response_data, graph, printed_routes):
     total_distance = sum(dijkstra(graph, route_data[j], route_data[j+1]) for j in range(len(route_data) - 1))
@@ -168,32 +169,37 @@ def print_route_info(route_data, response_data, graph, printed_routes):
             for segment in itinerary['itineraries'][0]['segments']:
                 unique_segments.add((segment['departure']['iataCode'], segment['arrival']['iataCode'], segment['carrierCode'], float(itinerary['price']['total'])))
 
-        if len(route_data) == 2:  # Direct flight
+        # Sort segments by price
+        sorted_segments = sorted(unique_segments, key=lambda x: x[3])
+
+        # Direct flight
+        if len(route_data) == 2:
             for origin, destination in zip(route_data[:-1], route_data[1:]):
-                for segment in unique_segments:
+                for segment in sorted_segments:
                     if segment[0] == origin and segment[1] == destination:
                         print(f"Route: [{origin}, {destination}]")
                         print(f"Total Distance: {round(total_distance, 2)} km")
                         print(f"Airline: {segment[2]}")
                         print(f"Total Price (SGD): {segment[3]}")
                         print()
-                        
-        else:  # Indirect flight
+
+        # Indirect flight        
+        else: 
             for i in range(len(route_data) - 1):
                 origin, destination = route_data[i], route_data[i+1]
-                modifiedRouteData=route_data[:-1]
-                for segment in unique_segments:
+                for segment in sorted_segments:
                     if segment[0] == origin and segment[1] == destination:
-                        print(f"Route: {modifiedRouteData}")
+                        print(f"Route: {route_data}")
                         print(f"Total Distance: {round(total_distance, 2)} km")
                         print(f"Airline: {segment[2]}")
                         print(f"Total Price (SGD): {segment[3]}")
                         print()
                         return  # Exit the loop after printing one route
 
+
 def main():
     # User input for origin and destination
-    filename = 'data/airports_Asia.csv'
+    filename = 'airports_Asia.csv'
 
     # Read airports with their latitude and longitude coordinates and country
     airports = read_airports_from_csv(filename)
