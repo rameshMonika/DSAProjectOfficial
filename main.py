@@ -284,11 +284,14 @@ def OneMap():
             request.form.get('Flyover', default="Not Stated"))
         dest_coordinate = html.unescape(
             request.form.get('Dest', default="Not Stated"))
+        FlightRoutes = request.form.get('FlightRoutes', default="Not Stated")
 
         return render_template('oneMap.html',
                                source_coordinate=source_coordinate,
                                flyover_coordinates=flyover_coordinates,
-                               dest_coordinate=dest_coordinate)
+                               dest_coordinate=dest_coordinate,
+                               FlightRoutes=FlightRoutes
+                               )
     else:
         return render_template('oneMap.html')
 

@@ -12,19 +12,69 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         #map {
-            height: 600px;
+            height: 630px;
+        }
+
+        #pointList {
+            margin: 0 20px;
+            /* Adjust margin as needed */
+            max-height: auto;
+            /* overflow-y: auto; */
+            /* border: 1px solid #ccc; */
+            padding: 10px;
+
+        }
+
+        #pointList a {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+
+        }
+
+        .full-width-map {
+            width: 100%;
+        }
+
+        #pointListContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header {
+            margin: 10px;
         }
     </style>
 </head>
 
 <body>
-    <h1>Flight Route Map</h1>
-    <div id="map"></div>
+    <h1 class="header">Flight Route Map</h1>
+    <!-- Print the flyover route here -->
+    <p id="flyoverRoute" class="header"></p>
+    <div class="row">
+        <div class="col-md-12" id="mapContainer">
+            <div id="map"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8" id="pointListContainer" style="display: none;">
+            <div id="pointList">
+                <h3>Flyover Airport</h3>
+                <!-- Add flyover points dynamically here -->
+            </div>
+        </div>
+    </div>
     <script>
         // Define actual coordinates for source, stopover, and destination
         var sourceCoordinate = "{{ source_coordinate }}";
         var flyoverCoordinates = "{{ flyover_coordinates }}";
         var destCoordinate = "{{ dest_coordinate }}";
+
+        // Split FlightRoutes names and get the individual flight routes
+        var flightRoutes = "{{ FlightRoutes }}".split(' &gt; ');
 
         // Convert the coordinates from string to array
         var sourceCoords = sourceCoordinate.split(',').map(Number);
@@ -39,15 +89,16 @@
         }).addTo(map);
 
         // Add markers for source and destination
-        var sourceMarker = L.marker(sourceCoords, { autoPopup: true })
+        var sourceMarker = L.marker(sourceCoords)
             .bindPopup('<b>Source Airport</b>')
             .addTo(map);
 
-        var destMarker = L.marker(destCoords, { autoPopup: true })
+        var destMarker = L.marker(destCoords)
             .bindPopup('<b>Destination Airport</b>')
             .addTo(map);
 
         console.log("Flyover coordinates:", flyoverCoordinates);
+        document.getElementById('flyoverRoute').textContent = "Route: " + flightRoutes.join(' > ');
 
         // Check if flyover coordinates are provided
         if (flyoverCoordinates !== "") {
@@ -71,14 +122,33 @@
                     flyoverPairs.push([flyoverCoords[i], flyoverCoords[i + 1]]);
                 }
 
+                // Print flyover route
+
+                index = 1
                 // Add markers for flyover airports
-                flyoverPairs.forEach(function (coord) {
-                    L.marker(coord, { autoPopup: true }).addTo(map)
+                flyoverPairs.forEach(function (coord, index) {
+                    index += 1; // Start index from 1
+                    var marker = L.marker(coord).addTo(map)
                         .bindPopup('<b>Flyover Airport</b>');
+                    // Add click event to navigate to the marker
+                    marker.on('click', function () {
+                        map.setView(marker.getLatLng(), 10); // Adjust zoom level as needed
+                    });
+                    // Add link to point list
+                    var pointLink = document.createElement('a');
+                    pointLink.href = '#';
+                    pointLink.textContent = 'Point [' + index + "] - " + flightRoutes[index]; // Set text content to include flight route name
+                    pointLink.className = 'pointLink';
+                    pointLink.dataset.lat = coord[0];
+                    pointLink.dataset.lng = coord[1];
+                    document.getElementById('pointList').appendChild(pointLink);
                 });
 
                 // Add polyline for flyover route
                 var flyoverPolyline = L.polyline([sourceCoords, ...flyoverPairs, destCoords], { color: 'red' }).addTo(map);
+
+                // Show the point list and its container
+                document.getElementById('pointListContainer').style.display = 'block';
             } catch (error) {
                 console.error('Error parsing flyover coordinates:', error);
                 console.log('Flyover coordinates value:', flyoverCoordinates);
@@ -91,6 +161,16 @@
         // Fit map to show all markers and polylines
         var bounds = new L.LatLngBounds([sourceCoords, destCoords]);
         map.fitBounds(bounds);
+
+        // Add click event to point list items
+        document.querySelectorAll('.pointLink').forEach(function (pointLink) {
+            pointLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                var lat = parseFloat(this.dataset.lat);
+                var lng = parseFloat(this.dataset.lng);
+                map.setView([lat, lng], 11); // Zoom in around 110%
+            });
+        });
     </script>
 </body>
 
