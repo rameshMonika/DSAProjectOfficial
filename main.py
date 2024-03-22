@@ -1,3 +1,6 @@
+# Import necessary libraries
+import html
+import json
 from flask import Flask, request, jsonify, render_template
 import csv
 import math
@@ -5,12 +8,16 @@ import math
 from amadeus import Client, ResponseError
 from datetime import datetime
 
+# Initialize Flask app
 app = Flask(__name__)
 
+# Initialize Amadeus client
 amadeus = Client(
     client_id='BxsFW8YgIcfqCGSiwk1GPvcJnttW266T',
     client_secret='WnFBmc33acG9bWHf'
 )
+
+# Helper function to get flight offers
 
 
 def get_flight_offers(origin, destination):
@@ -42,7 +49,7 @@ def get_flight_offers(origin, destination):
 
     return flight_offers
 
-# Calculates the distance between two points given their latitude and longitude
+# Helper function to calculate distance between two points given their latitude and longitude
 
 
 def calculate_distance(lat1, lon1, lat2, lon2):
@@ -67,7 +74,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
     return distance
 
-# Data manipulation to retrieve relevant information from csv file
+# Helper function to read airports data from CSV file
 
 
 def read_airports_from_csv(filename):
@@ -82,7 +89,7 @@ def read_airports_from_csv(filename):
             airports[iata_code] = {'country': country, 'coords': (lat, lon)}
     return airports
 
-# Construct the graph dictionary - the airport locations becomes a node in the graph
+# Helper function to get country coordinate from country name
 
 
 def get_country_coordinate_from_country(country):
@@ -92,11 +99,13 @@ def get_country_coordinate_from_country(country):
         reader = csv.reader(csvfile)
         for row in reader:
             if row[3].strip().lower() == country.lower():  # Check if the country matches
-                coordinate = (float(row[4]), float(
-                    row[5]))  # Save the coordinates
+                # Save the coordinates
+                coordinate = (float(row[4]), float(row[5]))
                 print(f"{country} Coordinate:", coordinate)
                 return coordinate
     return coordinate
+
+# Helper function to construct graph dictionary representing airport connections
 
 
 def construct_graph(airports):
@@ -122,7 +131,7 @@ def construct_graph(airports):
                               for conn in connections]
     return graph
 
-# Algorithm to generate possible flight routes including layover flights
+# Helper function to perform Depth-First Search (DFS) to generate flight routes
 
 
 def dfs(graph, current, destination, max_layovers, path, routes, max_routes, airports):
@@ -136,18 +145,17 @@ def dfs(graph, current, destination, max_layovers, path, routes, max_routes, air
             dfs(graph, neighbor, destination, max_layovers,
                 path + [neighbor], routes, max_routes, airports)
 
-# Function to get flight routes
+# Helper function to get flight routes
 
 
 def get_flight_routes(origin, destination, max_layovers, airports):
     # Construct the graph based on the distances between airports and their countries
-
     graph = construct_graph(airports)
 
     # Set max routes to 10. Can be changed accordingly
     max_routes = 10
 
-    # Empty array which will then be filled with generated routes using dfs algorithm
+    # Empty array which will then be filled with generated routes using DFS algorithm
     routes = []
 
     # Check for direct flight
@@ -177,7 +185,7 @@ def get_flight_routes(origin, destination, max_layovers, airports):
                     origin_iata = route[i]
                     dest_iata = route[i + 1]
                     origin_coords = airports[origin_iata]['coords']
-                    # store source coordinate
+                    # Store source coordinate
                     dest_coords = origin_coords[0], origin_coords[1]
                     distance = calculate_distance(
                         origin_coords[0], origin_coords[1], dest_coords[0], dest_coords[1])
@@ -193,14 +201,7 @@ def get_flight_routes(origin, destination, max_layovers, airports):
         else:
             return []
 
-# Route to render the index.html template
-
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-# Function to calculate flyover coordinates for each route
+# Helper function to calculate flyover coordinates for each route
 
 
 def calculate_flyover_coordinates(route, airports):
@@ -220,6 +221,7 @@ def get_route():
     destination = request.args.get('destination').upper()
     max_layovers = int(request.args.get('layover'))
 
+    # Get source and destination coordinates
     source_coordinate = get_country_coordinate_from_country(origin)
     dest_coordinate = get_country_coordinate_from_country(destination)
 
@@ -251,7 +253,8 @@ def get_route():
         routes_with_flyover.append({
             'route': route,
             'flyover_coordinates': flyover_coordinates,
-            'dest_coordinate': dest_coordinate,
+            # Use default coordinates if dest_coordinate is None
+            'dest_coordinate': dest_coordinate if dest_coordinate else (0, 0),
             "sourceCoordinate": source_coordinate,
             "total_distance": total_distance
         })
@@ -259,18 +262,28 @@ def get_route():
     print(routes_with_flyover)
     print(source_coordinate)
 
-    return jsonify({"routes": routes_with_flyover})
+    return jsonify({"routes": routes_with_flyover, "sourceCoordinate": source_coordinate})
+
+# Route to render the index.html template
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Route to handle OneMap view
 
 
 @app.route('/OneMap', methods=['GET', 'POST'])
 def OneMap():
     if request.method == 'POST':
-        source_coordinate = request.form.get(
-            'Source') if request.form.get('Source') != "" else "Not Stated"
-        flyover_coordinates = request.form.get(
-            'Flyover') if request.form.get('Flyover') != "" else "Not Stated"
-        dest_coordinate = request.form.get(
-            'Dest') if request.form.get('Dest') != "" else "Not Stated"
+        # Decode HTML entities
+        source_coordinate = html.unescape(
+            request.form.get('Source', default="Not Stated"))
+        flyover_coordinates = html.unescape(
+            request.form.get('Flyover', default="Not Stated"))
+        dest_coordinate = html.unescape(
+            request.form.get('Dest', default="Not Stated"))
 
         return render_template('oneMap.html',
                                source_coordinate=source_coordinate,

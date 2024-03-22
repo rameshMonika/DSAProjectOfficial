@@ -5,18 +5,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map</title>
+    <!-- Include Leaflet CSS and JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        #map {
+            height: 600px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>one MAP Page</h1>
-    <div>
+    <h1>Flight Route Map</h1>
+    <div id="map"></div>
+    <script>
+        // Define actual coordinates for source, stopover, and destination
+        var sourceCoordinate = "{{ source_coordinate }}";
+        var flyoverCoordinates = "{{ flyover_coordinates }}";
+        var destCoordinate = "{{ dest_coordinate }}";
 
-        <p>Source Coordinate: {{ source_coordinate }}</p>
-        <p>FlyOver Coordinate: {{ flyover_coordinates }}</p>
-        <p>Destination Coordinate: {{ dest_coordinate }}</p>
-        <!-- Embedded map will be rendered here -->
-        {{ map_html | safe }}
-    </div>
+        // Convert the coordinates from string to array
+        var sourceCoords = sourceCoordinate.split(',').map(Number);
+        var destCoords = destCoordinate.split(',').map(Number);
+
+        // Initialize map
+        var map = L.map('map').setView(sourceCoords, 5); // Set default view to source coordinates
+
+        // Add tile layer (you can use different map providers)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add markers for source and destination
+        var sourceMarker = L.marker(sourceCoords, { autoPopup: true })
+            .bindPopup('<b>Source Airport</b>')
+            .addTo(map);
+
+        var destMarker = L.marker(destCoords, { autoPopup: true })
+            .bindPopup('<b>Destination Airport</b>')
+            .addTo(map);
+
+        console.log("Flyover coordinates:", flyoverCoordinates);
+
+        // Check if flyover coordinates are provided
+        if (flyoverCoordinates !== "") {
+            console.log("Attempting to parse flyover coordinates...");
+            try {
+                // Split the coordinates string into an array
+                var flyoverCoords = flyoverCoordinates.split(',').map(function (coord) {
+                    // Convert each coordinate to a number
+                    return parseFloat(coord.trim());
+                });
+
+                console.log("Successfully parsed flyover coordinates:", flyoverCoords);
+
+                if (flyoverCoords.length % 2 !== 0) {
+                    throw new Error("Invalid number of coordinates. Each coordinate should have both latitude and longitude.");
+                }
+
+                // Group coordinates into pairs
+                var flyoverPairs = [];
+                for (var i = 0; i < flyoverCoords.length; i += 2) {
+                    flyoverPairs.push([flyoverCoords[i], flyoverCoords[i + 1]]);
+                }
+
+                // Add markers for flyover airports
+                flyoverPairs.forEach(function (coord) {
+                    L.marker(coord, { autoPopup: true }).addTo(map)
+                        .bindPopup('<b>Flyover Airport</b>');
+                });
+
+                // Add polyline for flyover route
+                var flyoverPolyline = L.polyline([sourceCoords, ...flyoverPairs, destCoords], { color: 'red' }).addTo(map);
+            } catch (error) {
+                console.error('Error parsing flyover coordinates:', error);
+                console.log('Flyover coordinates value:', flyoverCoordinates);
+            }
+        } else {
+            // If no flyover coordinates, just connect source and destination
+            var directPolyline = L.polyline([sourceCoords, destCoords], { color: 'blue' }).addTo(map);
+        }
+
+        // Fit map to show all markers and polylines
+        var bounds = new L.LatLngBounds([sourceCoords, destCoords]);
+        map.fitBounds(bounds);
+    </script>
 </body>
 
 </html>
