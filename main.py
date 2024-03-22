@@ -1,8 +1,6 @@
-import json
 from flask import Flask, request, jsonify, render_template
 import csv
 import math
-import json
 
 from amadeus import Client, ResponseError
 from datetime import datetime
@@ -72,7 +70,9 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 # Data manipulation to retrieve relevant information from csv file
 
 
-def read_airports_from_csv(filename):
+def read_airports_from_csv():
+    filename = 'data/airports_Asia.csv'
+
     airports = {}
     with open(filename, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
@@ -87,18 +87,18 @@ def read_airports_from_csv(filename):
 # Construct the graph dictionary - the airport locations becomes a node in the graph
 
 
-def get_source_coordinate_from_country(country):
-    source_coordinate = None
+def get_country_coordinate_from_country(country):
+    coordinate = None
 
     with open('data/airports_Asia.csv', newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             if row[3].strip().lower() == country.lower():  # Check if the country matches
-                source_coordinate = (float(row[4]), float(
+                coordinate = (float(row[4]), float(
                     row[5]))  # Save the coordinates
-                print("Source Coordinate:", source_coordinate)
-                return source_coordinate
-    return source_coordinate
+                print(f"{country} Coordinate:", coordinate)
+                return coordinate
+    return coordinate
 
 
 def construct_graph(airports):
@@ -202,18 +202,37 @@ def get_flight_routes(origin, destination, max_layovers, airports):
 def index():
     return render_template('index.html')
 
+# Function to calculate flyover coordinates for each route
+
+
+def calculate_flyover_coordinates(route, airports):
+    flyover_coordinates = []
+    for i in range(1, len(route) - 2):
+        airport_code = route[i]
+        coordinates = airports[airport_code]['coords']
+        flyover_coordinates.append(coordinates)
+    return flyover_coordinates
 
 # Route to handle the get_route request
+
+
 @app.route('/get_route', methods=['GET'])
 def get_route():
+    source_coordinate = " "
+    dest_coordinate = " "
     origin = request.args.get('source').upper()
     destination = request.args.get('destination').upper()
     max_layovers = int(request.args.get('layover'))
     print(f"[user input] ORIGIN:{origin} DESTINATION:{
           destination} MAX_LAYOVERS:{max_layovers}")
 
-    filename = 'data/airports_Asia.csv'  # Change this if your file name is different
-    airports = read_airports_from_csv(filename)
+    source_coordinate = get_country_coordinate_from_country(origin)
+    dest_coordinate = get_country_coordinate_from_country(destination)
+    source_lat, source_lon = source_coordinate
+    dest_lat, dest_lon = dest_coordinate
+
+    airports = read_airports_from_csv()
+
     # Construct the graph based on airports
     graph = construct_graph(airports)
 
@@ -222,16 +241,37 @@ def get_route():
         origin, destination, max_layovers, airports=airports)
     flight_offers = get_flight_offers(origin, destination)
 
-    print(flight_routes)
-    source_coordinate = get_source_coordinate_from_country(origin)
+    # Calculate flyover coordinates for each route
+    routes_with_flyover = []
+    for route in flight_routes:
+        flyover_coordinates = calculate_flyover_coordinates(route, airports)
+        routes_with_flyover.append({
+            'route': route,
+            'flyover_coordinates': flyover_coordinates,
+            'dest_coordinate': dest_coordinate,
+        })
+    print(f'flyover_coordinates: {flyover_coordinates}')
+    print(f"dest_coordinate: {dest_coordinate}")
+
+    print(routes_with_flyover)
     print(source_coordinate)
 
-    return jsonify({"routes": flight_routes, "price": flight_offers, "sourceCoordinate": source_coordinate})
+    return jsonify({"routes": routes_with_flyover, "price": flight_offers, "sourceCoordinate": source_coordinate, "dest_coordinate": dest_coordinate})
 
 
-@app.route('/OneMap', methods=['GET'])
+@app.route('/OneMap', methods=['GET', 'POST'])
 def OneMap():
-    return render_template('oneMap.html')
+    if request.method == 'POST':
+        source_coordinate = request.form.get('Source')
+        flyover_coordinates = request.form.get('Flyover')
+        dest_coordinate = request.form.get('Dest')
+
+        return render_template('oneMap.html',
+                               source_coordinate=source_coordinate,
+                               flyover_coordinates=flyover_coordinates,
+                               dest_coordinate=dest_coordinate)
+    else:
+        return render_template('oneMap.html')
 
 
 # Main method to run the Flask app
