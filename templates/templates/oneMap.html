@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+</head>
+
+<body>
+    <h1>One MAP Page</h1>
+    <div>
+
+        <p>Source Coordinate: {{ source_coordinate }}</p>
+        <p>FlyOver Coordinate: {{ flyover_coordinates }}</p>
+        <p>Destination Coordinate: {{ dest_coordinate }}</p>
+        <!-- Embedded map will be rendered here -->
+        {{ map_html | safe }}
+    </div>
+    
+    <script>
+        function logCoordinates(label, coordinates) {
+            var coordsArray = coordinates.split(",");
+            var numCoords = coordsArray.length / 2;
+            console.log(label + ": " + (coordinates || "Not Stated"));
+            console.log("Sets of " + label + " coordinates: " + numCoords);
+        }
+
+        var source_coordinate = "{{ source_coordinate }}";
+        var flyover_coordinates = "{{ flyover_coordinates }}";
+        var dest_coordinate = "{{ dest_coordinate }}";
+
+        logCoordinates("Source Coordinate", source_coordinate);
+        logCoordinates("FlyOver Coordinates", flyover_coordinates);
+        logCoordinates("Destination Coordinate", dest_coordinate);
+    </script>
+
+
+</body>
+
+</html>
