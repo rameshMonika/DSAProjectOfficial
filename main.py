@@ -70,9 +70,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 # Data manipulation to retrieve relevant information from csv file
 
 
-def read_airports_from_csv():
-    filename = 'data/airports_Asia.csv'
-
+def read_airports_from_csv(filename):
     airports = {}
     with open(filename, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
@@ -218,53 +216,61 @@ def calculate_flyover_coordinates(route, airports):
 
 @app.route('/get_route', methods=['GET'])
 def get_route():
-    source_coordinate = " "
-    dest_coordinate = " "
     origin = request.args.get('source').upper()
     destination = request.args.get('destination').upper()
     max_layovers = int(request.args.get('layover'))
-    print(f"[user input] ORIGIN:{origin} DESTINATION:{
-          destination} MAX_LAYOVERS:{max_layovers}")
 
     source_coordinate = get_country_coordinate_from_country(origin)
     dest_coordinate = get_country_coordinate_from_country(destination)
-    source_lat, source_lon = source_coordinate
-    dest_lat, dest_lon = dest_coordinate
 
-    airports = read_airports_from_csv()
+    filename = 'data/airports_Asia.csv'
+    airports = read_airports_from_csv(filename)
 
-    # Construct the graph based on airports
     graph = construct_graph(airports)
 
-    # Get flight routes
+    routes_with_flyover = []
     flight_routes = get_flight_routes(
         origin, destination, max_layovers, airports=airports)
-    flight_offers = get_flight_offers(origin, destination)
 
-    # Calculate flyover coordinates for each route
-    routes_with_flyover = []
     for route in flight_routes:
         flyover_coordinates = calculate_flyover_coordinates(route, airports)
+        total_distance = 0
+        for i in range(len(route) - 1):
+            origin_iata = route[i]
+            dest_iata = route[i + 1]
+            if origin_iata != dest_iata:  # Check if origin and destination are different
+                origin_coords = airports[origin_iata]['coords']
+                dest_coords = dest_coordinate[0], dest_coordinate[1]
+                distance = calculate_distance(
+                    origin_coords[0], origin_coords[1], dest_coords[0], dest_coords[1])
+                total_distance += distance
+
+            print(f"Distance from {origin_iata} to {dest_iata}: {distance} km")
+        print(f"Total distance for route {route}: {total_distance} km")
+
         routes_with_flyover.append({
             'route': route,
             'flyover_coordinates': flyover_coordinates,
             'dest_coordinate': dest_coordinate,
+            "sourceCoordinate": source_coordinate,
+            "total_distance": total_distance
         })
-    print(f'flyover_coordinates: {flyover_coordinates}')
-    print(f"dest_coordinate: {dest_coordinate}")
 
     print(routes_with_flyover)
     print(source_coordinate)
 
-    return jsonify({"routes": routes_with_flyover, "price": flight_offers, "sourceCoordinate": source_coordinate, "dest_coordinate": dest_coordinate})
+    return jsonify({"routes": routes_with_flyover})
 
 
 @app.route('/OneMap', methods=['GET', 'POST'])
 def OneMap():
     if request.method == 'POST':
-        source_coordinate = request.form.get('Source')
-        flyover_coordinates = request.form.get('Flyover')
-        dest_coordinate = request.form.get('Dest')
+        source_coordinate = request.form.get(
+            'Source') if request.form.get('Source') != "" else "Not Stated"
+        flyover_coordinates = request.form.get(
+            'Flyover') if request.form.get('Flyover') != "" else "Not Stated"
+        dest_coordinate = request.form.get(
+            'Dest') if request.form.get('Dest') != "" else "Not Stated"
 
         return render_template('oneMap.html',
                                source_coordinate=source_coordinate,
