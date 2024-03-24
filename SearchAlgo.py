@@ -1,38 +1,17 @@
 import pandas as pd
 from geopy.distance import geodesic
 import time
+import os
 
 start = time.time()
+project_dir = os.getcwd()
 
 # Reading data from the file
 # Reading data from the file
 routes_with_distance_cols = ['Source airport', 'Destination airport', 'Distance']
+csv_file_path = os.path.join(project_dir,  'routes_with_distance.csv')
 
-routes_with_distance = pd.read_csv('CSC1108/Project/routes_with_distance.csv', usecols=routes_with_distance_cols)
 
-# source_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Source airport'})
-# destination_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Destination airport'})
-
-# routes_with_source = pd.merge(routes_edited, source_airports, on='Source airport', how='left')
-# routes_with_destination = pd.merge(routes_with_source, destination_airports, on='Destination airport', how='left')
-
-# Remove entries with null values for coordinates
-# routes_with_destination = routes_with_destination.dropna(subset=['Latitude_x', 'Longitude_x', 'Latitude_y', 'Longitude_y'])
-
-# #This part is to check if there are still null values in the dataset not needed in the actual code
-# null_inf_index = routes_with_destination[['Latitude_x', 'Longitude_x', 'Latitude_y', 'Longitude_y']].isnull().values.any() 
-
-# Calculate the distance between the source and destination airports in km
-# def calculate_distance(row):
-#     source = (row['Latitude_x'], row['Longitude_x'])
-#     dest = (row['Latitude_y'], row['Longitude_y'])
-#     return geodesic(source, dest).kilometers
-
-# Apply the function to the routes_with_coordinates dataset
-# This part takes quite awhile to run
-# routes_with_destination['Distance'] = routes_with_destination.apply(calculate_distance, axis=1)
-# print(routes_with_destination[['Source airport', 'Destination airport', 'Distance']])
-#routes_with_destination[['Source airport', 'Latitude_x', 'Longitude_x', 'Destination airport', 'Latitude_y', 'Longitude_y', 'Distance']].to_csv('routes_with_distance.csv', index=False)
 
 class HashTable:
     def __init__(self):
@@ -40,7 +19,7 @@ class HashTable:
         self.R = 67999  # Choose a prime number smaller than self.size
         self.keys = [None] * self.size
         self.values = [[] for _ in range(self.size)]
-        self.routes_with_distance = pd.read_csv('CSC1108/Project/routes_with_distance.csv')
+        self.routes_with_distance = pd.read_csv(csv_file_path, usecols=routes_with_distance_cols)
 
     def hashfunction(self, key):
         return sum(ord(c) for c in key) % self.size
@@ -79,21 +58,7 @@ class HashTable:
     # def get(self, key):
     #     startslot = self.hashfunction(key)
 
-    #     data = None
-    #     stop = False
-    #     found = False
-    #     position = startslot
-    #     i = 0
-    #     while self.keys[position] is not None and not found and not stop:
-    #         if self.keys[position] == key:
-    #             found = True
-    #             data = self.values[position]
-    #         else:
-    #             i += 1
-    #             position = self.rehash(startslot, i)
-    #             if position == startslot:
-    #                 stop = True
-        # return data
+   
         
     def get_route(self, src_airport):
         route = self.routes_with_distance[self.routes_with_distance['Source airport'] == src_airport]
@@ -136,12 +101,14 @@ def quick_sort(arr, low, high, reverse=False):
 hash_table = HashTable()
 
 # Iterate over the DataFrame
-for row in routes_with_distance.itertuples():
+# Iterate over the DataFrame
+for row in hash_table.routes_with_distance.itertuples():
     key = row[1]  # source airport code as the key
     dest_airport = row[2]  # destination airport code
     distance = row[3]  # distance
     value = (dest_airport, distance)  # value is a tuple containing the destination airport and the distance
     hash_table.put(key, value)
+
 
 end = time.time()
 print((end-start), "s")
