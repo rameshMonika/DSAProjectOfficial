@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form action="/OneMap" method="post">
+        <div class="card w-50 mb-2">
+            <div class="card-body">
+                <h5 class="card-title">Source Airport: ${route.route[0]}</h5>
+                <h5 class="card-title">Distance: ${route['total_distance']} km</h5>
+                <h5 class="card-title" id="FlightRoutes" name="FlightRoutes">ETA: ${route['estimated_time_hours']} hours
+                    ${route['estimated_time_minutes']} mins </h5>
+                <p class="card-text">From: ${routeInfo}</p>
+                <button type="submit" class="btn btn-primary">View More</a>
+            </div>
+        </div>
+        <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" readonly
+            value="${routeInfo}">
+        <input type="text" style="visibility: hidden;" id=" ETA" name="ETA"
+            value="${route['estimated_time_hours']} hours ${route['estimated_time_minutes']} mins" readonly>
+
+        <input type="text" id="Source" name="Source" readonly value="${route['sourceCoordinate']}">
+        <input type="text" id="Flyover" name="Flyover" readonly value="${route['flyover_coordinates']}"
+            style="visibility: hidden;">
+        <input type="text" id="Dest" name="Dest" readonly value="${route['dest_coordinate']}"
+            style="visibility: hidden;">
+    </form>
+</body>
+
+</html>

@@ -1,6 +1,3 @@
-# Import necessary libraries
-import html
-import json
 from flask import Flask, request, jsonify, render_template
 import csv
 import math
@@ -8,16 +5,12 @@ import math
 from amadeus import Client, ResponseError
 from datetime import datetime
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Initialize Amadeus client
 amadeus = Client(
     client_id='BxsFW8YgIcfqCGSiwk1GPvcJnttW266T',
     client_secret='WnFBmc33acG9bWHf'
 )
-
-# Helper function to get flight offers
 
 
 def get_flight_offers(origin, destination):
@@ -49,7 +42,7 @@ def get_flight_offers(origin, destination):
 
     return flight_offers
 
-# Helper function to calculate distance between two points given their latitude and longitude
+# Calculates the distance between two points given their latitude and longitude
 
 
 def calculate_distance(lat1, lon1, lat2, lon2):
@@ -74,7 +67,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
     return distance
 
-# Helper function to read airports data from CSV file
+# Data manipulation to retrieve relevant information from csv file
 
 
 def read_airports_from_csv(filename):
@@ -89,7 +82,14 @@ def read_airports_from_csv(filename):
             airports[iata_code] = {'country': country, 'coords': (lat, lon)}
     return airports
 
-# Helper function to get country coordinate from country name
+
+def calculate_estimated_time(distance):
+    # Calculate estimated time based on average flight speed (Assuming 800 km/h)
+    average_speed_kmh = 800
+    estimated_time_hours = distance / average_speed_kmh
+    estimated_time_minutes = (estimated_time_hours % 1) * 60
+    return int(estimated_time_hours), int(estimated_time_minutes)
+# Construct the graph dictionary - the airport locations becomes a node in the graph
 
 
 def get_country_coordinate_from_country(country):
@@ -99,13 +99,13 @@ def get_country_coordinate_from_country(country):
         reader = csv.reader(csvfile)
         for row in reader:
             if row[3].strip().lower() == country.lower():  # Check if the country matches
-                # Save the coordinates
-                coordinate = (float(row[4]), float(row[5]))
+                latitude = float(row[4])
+                longitude = float(row[5])
+                # Save the coordinates as a tuple
+                coordinate = (latitude, longitude)
                 print(f"{country} Coordinate:", coordinate)
                 return coordinate
     return coordinate
-
-# Helper function to construct graph dictionary representing airport connections
 
 
 def construct_graph(airports):
@@ -131,7 +131,7 @@ def construct_graph(airports):
                               for conn in connections]
     return graph
 
-# Helper function to perform Depth-First Search (DFS) to generate flight routes
+# Algorithm to generate possible flight routes including layover flights
 
 
 def dfs(graph, current, destination, max_layovers, path, routes, max_routes, airports):
@@ -145,17 +145,18 @@ def dfs(graph, current, destination, max_layovers, path, routes, max_routes, air
             dfs(graph, neighbor, destination, max_layovers,
                 path + [neighbor], routes, max_routes, airports)
 
-# Helper function to get flight routes
+# Function to get flight routes
 
 
 def get_flight_routes(origin, destination, max_layovers, airports):
     # Construct the graph based on the distances between airports and their countries
+
     graph = construct_graph(airports)
 
     # Set max routes to 10. Can be changed accordingly
     max_routes = 10
 
-    # Empty array which will then be filled with generated routes using DFS algorithm
+    # Empty array which will then be filled with generated routes using dfs algorithm
     routes = []
 
     # Check for direct flight
@@ -185,7 +186,7 @@ def get_flight_routes(origin, destination, max_layovers, airports):
                     origin_iata = route[i]
                     dest_iata = route[i + 1]
                     origin_coords = airports[origin_iata]['coords']
-                    # Store source coordinate
+                    # store source coordinate
                     dest_coords = origin_coords[0], origin_coords[1]
                     distance = calculate_distance(
                         origin_coords[0], origin_coords[1], dest_coords[0], dest_coords[1])
@@ -201,8 +202,6 @@ def get_flight_routes(origin, destination, max_layovers, airports):
         else:
             return []
 
-# Helper function to calculate flyover coordinates for each route
-
 
 def calculate_flyover_coordinates(route, airports):
     flyover_coordinates = []
@@ -212,7 +211,10 @@ def calculate_flyover_coordinates(route, airports):
         flyover_coordinates.append(coordinates)
     return flyover_coordinates
 
-# Route to handle the get_route request
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 @app.route('/get_route', methods=['GET'])
@@ -221,7 +223,6 @@ def get_route():
     destination = request.args.get('destination').upper()
     max_layovers = int(request.args.get('layover'))
 
-    # Get source and destination coordinates
     source_coordinate = get_country_coordinate_from_country(origin)
     dest_coordinate = get_country_coordinate_from_country(destination)
 
@@ -247,51 +248,43 @@ def get_route():
                     origin_coords[0], origin_coords[1], dest_coords[0], dest_coords[1])
                 total_distance += distance
 
-            print(f"Distance from {origin_iata} to {dest_iata}: {distance} km")
+                print(f"Distance from {origin_iata} to {
+                      dest_iata}: {distance} km")
         print(f"Total distance for route {route}: {total_distance} km")
+
+        estimated_time_hours, estimated_time_minutes = calculate_estimated_time(
+            total_distance)
 
         routes_with_flyover.append({
             'route': route,
             'flyover_coordinates': flyover_coordinates,
-            # Use default coordinates if dest_coordinate is None
-            'dest_coordinate': dest_coordinate if dest_coordinate else (0, 0),
+            'dest_coordinate': dest_coordinate,
             "sourceCoordinate": source_coordinate,
-            "total_distance": total_distance
+            "total_distance": total_distance,
+            'estimated_time_hours': int(estimated_time_hours),
+            'estimated_time_minutes': int(estimated_time_minutes)
         })
-
-    print(routes_with_flyover)
-    print(source_coordinate)
-
-    return jsonify({"routes": routes_with_flyover, "sourceCoordinate": source_coordinate})
-
-# Route to render the index.html template
-
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-# Route to handle OneMap view
+    return jsonify({"routes": routes_with_flyover})
 
 
 @app.route('/OneMap', methods=['GET', 'POST'])
 def OneMap():
     if request.method == 'POST':
-        # Decode HTML entities
-        source_coordinate = html.unescape(
-            request.form.get('Source', default="Not Stated"))
-        flyover_coordinates = html.unescape(
-            request.form.get('Flyover', default="Not Stated"))
-        dest_coordinate = html.unescape(
-            request.form.get('Dest', default="Not Stated"))
-        FlightRoutes = request.form.get('FlightRoutes', default="Not Stated")
+        source_coordinate = request.form.get('Source', default="Not Stated")
+        flyover_coordinates = request.form.get('Flyover', default="Not Stated")
+        dest_coordinate = request.form.get('Dest', default="Not Stated")
+        est_testimatedTime = request.form.get('ETA', default="Not Stated")
+        total_distance = request.form.get(
+            'totalDistance', default="Not Stated")
+        flight_routes = request.form.get('FlightRoutes', default="Not Stated")
 
         return render_template('oneMap.html',
                                source_coordinate=source_coordinate,
                                flyover_coordinates=flyover_coordinates,
                                dest_coordinate=dest_coordinate,
-                               FlightRoutes=FlightRoutes
-                               )
+                               totalDistance=total_distance,
+                               est_testimatedTime=est_testimatedTime,
+                               flight_routes=flight_routes)
     else:
         return render_template('oneMap.html')
 
