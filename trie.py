@@ -26,8 +26,8 @@ class Trie:
 
     def wordsuggestions(self, node, word, prefix):
         suggestions = []
-        if node.is_end_of_word:
+        if node.finishedEntry:
             suggestions.append(prefix + word)
         for a, n in node.children.items():
-            suggestions.extend(self._suggest_word(n, word + a, prefix))
+            suggestions.extend(self.wordsuggestions(n, word + a, prefix))
         return suggestions
