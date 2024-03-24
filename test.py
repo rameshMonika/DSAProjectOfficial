@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Read data
 airports_cols = ['Airport ID','City', 'Country', 'IATA', 'ICAO', 'Latitude', 'Longitude', 'Altitude', 'Timezone', 'DST', 'Tz database time zone', 'Type', 'Source']
 routes_cols = ['Airline', 'Airline ID', 'Source airport', 'Source airport ID', 'Destination airport', 'Destination airport ID', 'Codeshare', 'Stops', 'Equipment']
-airports = pd.read_csv('data/airports.csv', names=airports_cols, header=None, index_col=None, na_values='\\N')
+airports = pd.read_csv('data/airports_Asia.csv', names=airports_cols, header=None, index_col=None, na_values='\\N')
 routes = pd.read_csv('data/routes.csv', names=routes_cols, header=None, index_col=None, na_values='\\N')
 source_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Source airport'})
 destination_airports = airports[['IATA', 'Latitude', 'Longitude']].rename(columns={'IATA': 'Destination airport'})
