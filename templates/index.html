@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Airport Code Suggestions</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function(){
+      $("#prefix").on("input", function(){
+        $.getJSON("/suggest", {prefix: $(this).val()}, function(data){
+          // Clear the datalist
+          $("#suggestions").empty();
+          
+          // Add each suggestion to the datalist
+          $.each(data, function(i, suggestion){
+            $("#suggestions").append($("<option>").val(suggestion));
+          });
+        });
+      });
+    });
+    </script>
+</head>
+<body>
+    <input type="text" id="prefix" list="suggestions" placeholder="Enter prefix">
+    <datalist id="suggestions"></datalist>
+</body>
+</html>
