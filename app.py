@@ -2,14 +2,16 @@
 from flask import Flask, request, render_template, jsonify
 from trie import Trie
 import csv
-
+import os
 app = Flask(__name__)
 
 # Create Trie instance
 trie = Trie()
 
+project_dir = os.getcwd()
+csv_file_path = os.path.join(project_dir,  'airports_Asia.csv')
 # Read airport codes from CSV file and insert into Trie
-with open('C:\\Users\\Edric Ho\\Downloads\\SIT\\code\\CSC1108\\Git\\DSAProjectOfficial\\airports_Asia.csv', 'r',encoding='utf-8') as f:
+with open(csv_file_path, 'r',encoding='utf-8') as f:
     reader = csv.reader(f)
     next(reader)  # Skip header row
     for row in reader:
