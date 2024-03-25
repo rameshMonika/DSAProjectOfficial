@@ -153,6 +153,7 @@ def dijkstra(graph, origin, destination):
         path.append(airport)
         airport = previous[airport]
 
+    #         country code, shortest route
     return path[::-1], distances[destination]
 
 # Method to get the most optimal route considering both cost and distance
