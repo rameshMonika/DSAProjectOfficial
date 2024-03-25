@@ -77,7 +77,7 @@
                     output.innerHTML += generateFlightCard(route, routeInfo);
                 }
                 // Print destination coordinates only once
-                output.innerHTML += `<p>Dest Airport Coordinates: ${JSON.stringify(data.routes[0]['dest_coordinate'])}</p>`;
+                // output.innerHTML += `<p>Dest Airport Coordinates: ${JSON.stringify(data.routes[0]['dest_coordinate'])}</p>`;
             } else {
                 output.innerText = 'Route not found.';
             }
@@ -95,7 +95,7 @@
         }
 
         function generateFlightCard(route, routeInfo) {
-            console.log("show route : "+routeInfo);
+            console.log("show route : " + routeInfo);
 
             return `
     <form action="/OneMap" method="post">

@@ -202,7 +202,8 @@
             });
         });
         var flightDetailsContent = document.getElementById('flightDetailsContent');
-        var estEstimatedTime = "{{ est_estimatedTime }}";
+        var estEstimatedTime = "{{ est_testimatedTime }}";
+        console.log("ETA: ", estEstimatedTime)
         var route = "{{ flight_routes }}";
         var flightDetailsHTML = `
             <div class="flight-detail">
