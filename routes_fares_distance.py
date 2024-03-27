@@ -208,60 +208,52 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                         indirect_flights_data.append((route_data, round(total_distance, 2), segment[2], segment[3]))
                         return indirect_flights_data
                     
-def find_optimal_route(graph, origin, destination, response_data, airports):
-    routes = dfs(graph, origin, destination, 2, [origin], response_data)
-    
-    # Find the most optimal route based on cost and distance
+def find_optimal_route(graph, direct_route, routes, response_data, airports, origin, destination):
     optimal_route = None
-    min_cost = float('inf')
-    min_distance = float('inf')
-    optimal_airline = None
-    
-    for route in routes:
-        total_distance = sum(dijkstra(graph, route[j], route[j+1]) for j in range(len(route) - 1))
-        total_cost = sum(get_flight_prices(route[j], route[j+1], response_data) for j in range(len(route) - 1))
-        
-        # Determine the airlines for the current route
-        airlines = set()
-        for itinerary in response_data:
-            route_airlines = set()
-            segments = itinerary['itineraries'][0]['segments']
-            matching_segments = []
-            for i in range(len(route) - 1):
-                for segment in segments:
-                    if segment['departure']['iataCode'] == route[i] and segment['arrival']['iataCode'] == route[i+1]:
-                        matching_segments.append(segment)
-            if matching_segments:
-                for matching_segment in matching_segments:
-                    route_airlines.add(matching_segment['carrierCode'])
-            if route_airlines:
-                airlines.update(route_airlines)
-        
-        if total_cost < min_cost or (total_cost == min_cost and total_distance < min_distance):
-            min_cost = total_cost
-            min_distance = total_distance
-            optimal_route = route
-            # Select an arbitrary airline from the set of airlines
-            optimal_airline = select_optimal_airline(optimal_route, response_data)
-    
-    return optimal_route, min_cost, min_distance, optimal_airline
+    optimal_cost = float('inf')
 
-def select_optimal_airline(route, response_data):
-    airline_count = {}
+    if direct_route:
+        # Calculate total cost for the direct route
+        direct_cost = get_flight_prices(direct_route[0], direct_route[1], response_data)
+        if direct_cost < optimal_cost:
+            optimal_route = direct_route
+            optimal_cost = direct_cost
+    elif routes:
+        for route in routes:
+            total_cost = sum(get_flight_prices(route[j], route[j+1], response_data) for j in range(len(route) - 1))
+            if total_cost < optimal_cost:
+                optimal_route = route
+                optimal_cost = total_cost
+
+    return optimal_route
+
+def print_optimal_route(optimal_route, response_data, graph, airports):
+    if optimal_route:
+        print("-----------------------------------------")
+        print("Optimal Route:")
+        print(f"Route: {optimal_route}")
+        total_distance = 0
+        total_cost = 0
+        for i in range(len(optimal_route) - 1):
+            origin, destination = optimal_route[i], optimal_route[i+1]
+            distance = dijkstra(graph, origin, destination)
+            total_distance += distance
+            airline, cost = get_airline_and_cost_for_route(origin, destination, response_data)
+            total_cost += cost
+            print(f"From {origin} to {destination}: Airline - {airline}, Distance - {distance} km, Cost - {cost} SGD")
+        print(f"Total Distance for the route: {total_distance} km")
+        print(f"Total Cost for the route: {total_cost} SGD")
+        print("-----------------------------------------")
+    else:
+        print("No optimal route available.")
+
+def get_airline_and_cost_for_route(origin, destination, response_data):
     for itinerary in response_data:
         segments = itinerary['itineraries'][0]['segments']
         for segment in segments:
-            for i in range(len(route) - 1):
-                if segment['departure']['iataCode'] == route[i] and segment['arrival']['iataCode'] == route[i+1]:
-                    airline_code = segment['carrierCode']
-                    if airline_code in airline_count:
-                        airline_count[airline_code] += 1
-                    else:
-                        airline_count[airline_code] = 1
-    # Select the airline with the highest count
-    optimal_airline = max(airline_count, key=airline_count.get)
-    return optimal_airline
-
+            if segment['departure']['iataCode'] == origin and segment['arrival']['iataCode'] == destination:
+                return segment['carrierCode'], float(itinerary['price']['total'])
+    return "Unknown", 0.0
 
 
 
@@ -327,17 +319,8 @@ def main():
         while True:
             selection = input("Do you want to see direct flights only? (yes/no): ").lower()
             if selection == "yes":
-                
-                optimal_route, min_cost, min_distance, optimal_airline = find_optimal_route(graph, origin, destination, response_data, airports)
-                
-                if optimal_route:
-                    print("Optimal Route:", optimal_route)
-                    print_flight_routes(graph, [], [optimal_route], response_data, airports, origin, destination)
-                    print("Optimal Cost:", min_cost)
-                    print("Optimal Distance:", min_distance)
-                    print("Optimal Airline:", optimal_airline, "\n")
-                else:
-                    print("No optimal route found. \n")
+                optimal_route = find_optimal_route(graph, direct_route, [], response_data, airports, origin, destination)
+                print_optimal_route(optimal_route, response_data, graph, airports)
                 
                 if direct_route:
                     # Print direct route
@@ -346,17 +329,9 @@ def main():
                     print("No direct flight available.")
                 break
             elif selection == "no":
-                # Find optimal route for indirect flights
-                optimal_route, min_cost, min_distance, optimal_airline = find_optimal_route(graph, origin, destination, response_data, airports)
-                
-                if optimal_route:
-                    print("Optimal Route:", optimal_route)
-                    print_flight_routes(graph, [], [optimal_route], response_data, airports, origin, destination)
-                    print("Optimal Cost:", min_cost)
-                    print("Optimal Distance:", min_distance)
-                    print("Optimal Airline:", optimal_airline, "\n")
-                else:
-                    print("No optimal route found. \n")
+                routes = dfs(graph, origin, destination, 2, [origin], response_data)
+                optimal_route = find_optimal_route(graph, [], routes, response_data, airports, origin, destination)
+                print_optimal_route(optimal_route, response_data, graph, airports)
                 
                 routes = dfs(graph, origin, destination, 2, [origin], response_data)
                 print_flight_routes(graph, [], routes, response_data, airports, origin, destination)
