@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Information</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        /* Custom CSS for the plane icon */
+        .plane-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .plane-icon .plane {
+            position: absolute;
+            font-size: 24px;
+            color: #007bff;
+            /* Change the color as needed */
+        }
+
+        .LegInfo_stopLine__MzUxZ {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: .125rem;
+            margin: .25rem auto;
+            padding: 0;
+            border-radius: .5rem;
+            background-color: #626971;
+            line-height: 0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        Flight Information
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="card-title">Source: <span id="sourcePlaceholder">New York</span></h5>
+                                <h5 class="card-title">Destination: <span id="destinationPlaceholder">London</span></h5>
+                                <h5 class="card-title">Distance: <span id="distancePlaceholder">3500 km</span></h5>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="card-title">Airline: <span id="airlinePlaceholder">Delta Airlines</span></h5>
+                                <h5 class="card-title">Price: <span id="pricePlaceholder">$500</span></h5>
+                            </div>
+                        </div>
+                        <hr>
+                        <h5 class="card-title">Route:</h5>
+                        <div class="plane-icon">
+                            <div class="LegInfo_stopLine__MzUxZ"></div>
+                            <i class="fas fa-plane plane"></i>
+                            <p class="card-text" id="routePlaceholder">New York -> London</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
