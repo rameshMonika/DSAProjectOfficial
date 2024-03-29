@@ -9,6 +9,7 @@ from .controllers import (
     find_optimal_route,
     print_optimal_route,
     get_country_coordinate_from_country,
+    getRouteCoordinate,
 )
 import os
 from .trie import Trie
@@ -49,6 +50,8 @@ def OneMap():
         est_testimatedTime = request.form.get("ETA", default="Not Stated")
         total_distance = request.form.get("totalDistance", default="Not Stated")
         FlightRoutes = request.form.get("FlightRoutes", default="Not Stated")
+        source_coordinate = request.form.get("Source", default="Not Stated")
+        dest_coordinate = request.form.get("Dest", default="Not Stated")
 
         return render_template(
             "oneMap.html",
@@ -56,6 +59,9 @@ def OneMap():
             est_testimatedTime=est_testimatedTime,
             FlightRoutes=FlightRoutes,
             allCoordinate=allCoordinate,
+            source_coordinate=source_coordinate,
+            dest_coordinate=dest_coordinate,
+            
         )
     else:
         return render_template("oneMap.html")
@@ -79,10 +85,10 @@ def search_flights():
     flight_coordinates.append(source_coordinate)
     flight_coordinates.append(dest_coordinate)
 
-    print("source & Destination Coord:", flight_coordinates)
+    print("Source & Destination Coord:", flight_coordinates)
+
     # Read airports data from CSV file
     current_dir = os.path.dirname(__file__)
-
     filename = os.path.join(current_dir, "data", "airports_Asia.csv")
     airports = read_airports_from_csv(filename)
 
@@ -129,6 +135,7 @@ def search_flights():
             optimal_route_data = print_optimal_route(
                 optimal_route, response_data, graph, airports
             )
+
             print(
                 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
             )
@@ -168,7 +175,7 @@ def search_flights():
                 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
             )
 
-            All_coordinates = getFlyoverCoordinate(routes)
+            All_coordinates = getRouteCoordinate(routes)
             print("Allcoordinates", All_coordinates)
 
             # direct_data, _=()
@@ -180,15 +187,3 @@ def search_flights():
 
     else:
         return jsonify({"error": "No flight data available."})
-
-
-def getFlyoverCoordinate(flyover):
-    country_codes = []
-    for i in range(len(flyover)):
-        oneRoute = []
-        for j in range(len(flyover[i])):
-            oneRoute.append(get_country_coordinate_from_country(flyover[i][j]))
-            # print(f"oneRoute[{j}] {oneRoute[j]}")
-        country_codes.append(oneRoute)
-
-    return country_codes

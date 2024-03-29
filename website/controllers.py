@@ -13,6 +13,7 @@ amadeus = Client(
 
 # Define helper functions
 
+
 # Function to calculate the distance between two points given their latitude and longitude
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371.0
@@ -46,6 +47,7 @@ def read_airports_from_csv(filename):
             airports[iata_code] = {"country": country, "coords": (lat, lon)}
     return airports
 
+
 # Function to construct the graph dictionary
 def construct_graph(airports):
     graph = {}
@@ -62,6 +64,7 @@ def construct_graph(airports):
                 distances[dest_iata] = distance
         graph[origin_iata] = distances
     return graph
+
 
 # Function to find the shortest distance between two airports using Dijkstra's algorithm
 def dijkstra(graph, start, end):
@@ -137,6 +140,7 @@ def dfs(graph, origin, destination, max_layovers, path, response_data, visited=N
     visited.remove(origin)
     return routes
 
+
 # Provided sorting functions
 def ascendingQuickSort(arr):
     if len(arr) <= 1:
@@ -211,6 +215,7 @@ def print_flight_routes(
 
     return direct_data, indirect_data
 
+
 def get_airline_and_cost_for_route(origin, destination, response_data):
     for itinerary in response_data:
         segments = itinerary["itineraries"][0]["segments"]
@@ -224,6 +229,7 @@ def get_airline_and_cost_for_route(origin, destination, response_data):
 
 
 # return the output instead of printing it
+
 
 def find_optimal_route(
     graph, direct_route, routes, response_data, airports, origin, destination
@@ -249,6 +255,7 @@ def find_optimal_route(
 
     return optimal_route
 
+
 def print_optimal_route(optimal_route, response_data, graph, airports):
     optimal_route_data = []
     if optimal_route:
@@ -270,16 +277,27 @@ def print_optimal_route(optimal_route, response_data, graph, airports):
 
     return optimal_route_data
 
+
 # Function to handle each flight information
 def print_route_info(route_data, response_data, graph, printed_routes):
     total_distance = sum(
         dijkstra(graph, route_data[j], route_data[j + 1])
         for j in range(len(route_data) - 1)
     )
+
+    est_time = []
+    # calculate time (in Minus &Hours)
+    estimated_time_hours, estimated_time_minutes = calculate_estimated_time(
+        total_distance
+    )
+    est_time.append(int(estimated_time_hours))
+    est_time.append(int(estimated_time_minutes))
+
+    total_distance
     route_tuple = tuple(route_data)
     direct_flights_data = []
     indirect_flights_data = []
-    
+
     if route_tuple not in printed_routes:
         printed_routes.add(route_tuple)
         unique_segments = set()
@@ -294,7 +312,7 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                     )
                 )
         sorted_segments = sorted(unique_segments, key=lambda x: x[3])
-        
+
         if len(route_data) == 2:
             for origin, destination in zip(route_data[:-1], route_data[1:]):
                 for segment in sorted_segments:
@@ -305,10 +323,11 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                                 round(total_distance, 2),
                                 segment[2],
                                 segment[3],
+                                est_time,
                             )
                         )
             return direct_flights_data
-        
+
         elif len(route_data) > 2:
             for i in range(len(route_data) - 1):
                 origin, destination = route_data[i], route_data[i + 1]
@@ -320,11 +339,14 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                                 round(total_distance, 2),
                                 segment[2],
                                 segment[3],
+                                est_time,
                             )
                         )
                         return indirect_flights_data
 
-# (Amanda) - Add On 
+
+# (Amanda) - Add On
+
 
 # to calcualte distance between two points
 def calculate_estimated_time(distance):
@@ -335,13 +357,18 @@ def calculate_estimated_time(distance):
     return int(estimated_time_hours), int(estimated_time_minutes)
 
 
+
 def get_country_coordinate_from_country(country):
     coordinate = None
 
-    with open('website/data/airports_Asia.csv', newline='', encoding='utf-8') as csvfile:
+    with open(
+        "website/data/airports_Asia.csv", newline="", encoding="utf-8"
+    ) as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
-            if row[3].strip().lower() == country.lower():  # Check if the country matches
+            if (
+                row[3].strip().lower() == country.lower()
+            ):  # Check if the country matches
                 latitude = float(row[4])
                 longitude = float(row[5])
                 # Save the coordinates as a tuple
@@ -351,10 +378,22 @@ def get_country_coordinate_from_country(country):
     return coordinate
 
 
-def calculate_flyover_coordinates(route, airports):
+def get_all_coordinates(route, airports):
     flyover_coordinates = []
     for i in range(1, len(route) - 2):
         airport_code = route[i]
-        coordinates = airports[airport_code]['coords']
+        coordinates = airports[airport_code]["coords"]
         flyover_coordinates.append(coordinates)
     return flyover_coordinates
+
+
+def getRouteCoordinate(flyover):
+    country_codes = []
+    for i in range(len(flyover)):
+        oneRoute = []
+        for j in range(len(flyover[i])):
+            oneRoute.append(get_country_coordinate_from_country(flyover[i][j]))
+            # print(f"oneRoute[{j}] {oneRoute[j]}")
+        country_codes.append(oneRoute)
+
+    return country_codes
