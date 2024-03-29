@@ -42,7 +42,7 @@ def descendingQuickSort(arr,index):
     # right contains all elements with distance greater than pivot
     right = [x for x in arr if x[index] > pivot]
     # recursively sort left and right
-    return descendingQuickSort(right) + middle + descendingQuickSort(left)
+    return descendingQuickSort(right,index) + middle + descendingQuickSort(left,index)
 
 def sort_by_distance(data,order):
     if order == 'ascending':
