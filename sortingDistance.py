@@ -1,4 +1,4 @@
-def insertionSort(arr):
+def ascendingInsertionSort(arr):
     for i in range(1,len(arr)):
         key = arr[i]
         j = i-1
@@ -8,9 +8,19 @@ def insertionSort(arr):
         arr[j+1] = key
     return arr
 
+def descendingInsertionSort(arr):
+    for i in range(1,len(arr)):
+        key = arr[i]
+        j = i-1
+        while j >= 0 and key[1] > arr[j][1]:
+            arr[j+1] = arr[j]
+            j -= 1
+        arr[j+1] = key
+    return arr
+
 def ascendingQuickSort(arr):
     if len(arr) <= 10:
-        return insertionSort(arr)
+        return ascendingInsertionSort(arr)
     # pivot set to median distance
     pivot = arr[len(arr) // 2][1]
     # left contains all elements with distance less than pivot
@@ -23,7 +33,7 @@ def ascendingQuickSort(arr):
 
 def descendingQuickSort(arr):
     if len(arr) <= 10:
-        return insertionSort(arr)
+        return descendingInsertionSort(arr)
     # pivot set to median distance
     pivot = arr[len(arr) // 2][1]
     # left contains all elements with distance less than pivot
