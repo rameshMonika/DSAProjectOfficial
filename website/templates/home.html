@@ -105,18 +105,25 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    var flightCoordinates = data[2]['flight_coordinates'];
-                    console.log('Flight Coordinates', flightCoordinates);
-                    // console.log(data);
-                    // console.log(data[0])
+                    console.log(data)
+                    route_Coordinate = data[2]['Allcoordinates']
+                    //get the most optimal route (first route -> as its one from point A to B NO FLYOVERS!!)
+                    destCoordinate = route_Coordinate[0][1];
+                    SourceCoodinate = route_Coordinate[0][0];
+
+                    console.log(route_Coordinate);
+
+
                     var output = document.getElementById('output');
-                    var optimalRouteOutput = document.getElementById('optimalRouteOutput'); output.innerHTML = ''; // 
+                    var optimalRouteOutput = document.getElementById('optimalRouteOutput');
+                    output.innerHTML = ''; // 
                     optimalRouteOutput.innerHTML = ''; // Clear the output div
+
                     if (data[1].hasOwnProperty('optimal_route_data')) {
-                        // console.log("True")
-                        // console.log(data[1])
+
                         var route = data[1].optimal_route_data
                         var routeInfo = ""
+
                         for (let j = 0; j < route[0][0].length; j++) {
                             // console.log(route[0][0][j])
                             routeInfo += route[0][0][j];
@@ -124,9 +131,10 @@
                                 routeInfo += ' > '
                             }
                         }
+
                         var codeBlock = `
-                        <form action="/OneMap" method="post">
-                            <div class="card w-50 mb-2">
+                        <div class="card w-50 mb-2">
+                            <form action="/OneMap" method="post">
                                 <div class="card-body">
                                     <span class="badge badge-info">Best Optimal</span>
                                     <h5 class="card-title">Source Airport: ${route[0][0][0]}</h5>
@@ -137,142 +145,124 @@
                                     <p class="card-text">Route: ${routeInfo}</p>
                                     <button type="submit" class="btn btn-primary">View More</button>
                                 </div>
-                            </div>
 
-                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
-                                readonly>
-                            <p>
-                                <label for="ETA">Estimated Time of Arrival</label>
-                                <input type="text" style="visibility: visible;" id="ETA" name="ETA"
-                                    value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
-                            </p>
+                                <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
+                                    readonly>
 
-                            <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[0][2]}"
-                                readonly>
+                                <p>
+                                    <label for="ETA">Estimated Time of Arrival</label>
+                                    <input type="text" style="visibility: visible;" id="ETA" name="ETA"
+                                        value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
+                                </p>
 
+                                <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance"
+                                    value="${route[0][2]}" readonly>
 
-                                <input type="text" style="hidden: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
-                            <p>
-                                <label for="Flyover">Flyover</label>
-                                <input type="text" style="visibility: visible;" id="Flyover" name="Flyover"
-                                    value="${route['flyover_coordinates']}" readonly>
-                            </p>
+                                <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate"
+                                    value="${route_Coordinate[0]}" readonly>
 
-                            <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
-                        </form>`;
-
+                            </form>
+                        </div>`;
 
                         optimalRouteOutput.innerHTML += codeBlock
-                    } if (data[0].hasOwnProperty('direct_flight_data')) {
-                        // console.log("True")
-                        if (data[0].direct_flight_data.length > 0) {
-                            for (i = 0; i < data[0].direct_flight_data.length; i++) {
-                                var route = data[0].direct_flight_data[i]
-                                var routeInfo = ""
-                                for (let j = 0; j < route[0].length; j++) {
-                                    // console.log(route[0][j])
-                                    routeInfo += route[0][j];
-                                    if (j < route[0][j].length - 2) {
-                                        routeInfo += ' > '
+
+                    }
+                    for (var i = 1; i < route_Coordinate.length; i += 2) {
+                        console.log("route_Coordinate", route_Coordinate[i])
+
+                        if (data[0].hasOwnProperty('direct_flight_data')) {
+                            if (data[0].direct_flight_data.length > 0) {
+                                for (i = 0; i < data[0].direct_flight_data.length; i++) {
+                                    var route = data[0].direct_flight_data[i]
+                                    var routeInfo = ""
+                                    for (let j = 0; j < route[0].length; j++) {
+                                        // console.log(route[0][j])
+                                        routeInfo += route[0][j];
+                                        if (j < route[0][j].length - 2) {
+                                            routeInfo += ' > '
+                                        }
                                     }
-                                }
-                                var codeBlock = `
-                                <form action="/OneMap" method="post">
-
+                                    var codeBlock = `
                                     <div class="card w-50 mb-2">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Source Airport: ${route[0][0][0]}</h5>
-                                            <h5 class="card-title">Destination Airport: ${route[0][1]}</h5>
-                                            <p class="card-text">Distance: ${route[1]} km</p>
-                                            <p class="card-text">Airline: ${route[2]} </p>
-                                            <p class="card-text">Price: $${route[3]} </p>
-                                            <p class="card-text">Route: ${routeInfo}</p>
-                                            <button type="submit" class="btn btn-primary">View More</button>
-                                        </div>
+                                        <form action="/OneMap" method="post">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Source Airport: ${route[0][0][0]}</h5>
+                                                <h5 class="card-title">Destination Airport: ${route[0][route[0].length - 1]}</h5>
+                                                <p class="card-text">Distance: ${route[1]} km</p>
+                                                <p class="card-text">Airline: ${route[2]} </p>
+                                                <p class="card-text">Price: $${route[3]} </p>
+                                                <p class="card-text">Route: ${routeInfo}</p>
+                                                <button type="submit" class="btn btn-primary">View More</button>
+                                            </div>
+
+                                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
+                                                readonly>
+                                            <br>
+                                            <label for="ETA">Estimated Time of Arrival</label>
+                                            <input type="text" style="visibility: visible;" id="ETA" name="ETA"
+                                                value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
+
+                                            <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance" value="${route[1]}"
+                                                readonly>
+
+                                            <input type="text" style="visibility: hidden;" id="allCoordinate" name="allroute"
+                                                value="${route_Coordinate[i + 1]}" readonly>
+                                        </form>
                                     </div>
-
-                                    <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}" readonly>
-                                    <p>
-                                        <label for="ETA">Estimated Time of Arrival</label>
-                                        <input type="text" style="visibility: visible;" id="ETA" name="ETA"
-                                            value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
-                                    </p>
-
-                                    <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[1]}" readonly>
-
-
-                                        <input type="text" style="hidden: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
-                                    <p>
-                                        <label for="Flyover">Flyover</label>
-                                        <input type="text" style="visibility: visible;" id="Flyover" name="Flyover" value="${route['flyover_coordinates']}" readonly>
-                                    </p>
-
-                                    <input type="text" id="Dest" name="Dest" value="${flightCoordinates[1]}" style="visibility: hidden;" readonly>
-                                    </form>
-                                
                                 `;
-                                output.innerHTML += codeBlock
+                                    output.innerHTML += codeBlock
+                                }
                             }
+                        } else if (data.hasOwnProperty('error')) {
+                            output.innerHTML += `<p>${data.error}</p>`
                         }
-                    } else if (data.hasOwnProperty('error')) {
-                        output.innerHTML += `<p>${data.error}</p>`
-                    }
-                    else {
-                        // console.log("False")
-                        if (data[0].indirect_flight_data.length > 0) {
-                            for (i = 0; i < data[0].indirect_flight_data.length; i++) {
-                                var route = data[0].indirect_flight_data[i]
-                                // console.log("---------------------------------------")
-                                // console.log(route)
-                                // console.log("---------------------------------------")
-                                var routeInfo = ""
-                                for (let j = 0; j < route[0].length; j++) {
-                                    // console.log(route[0][j])
-                                    routeInfo += route[0][j];
-                                    if (j < route[0][j].length - 1) {
-                                        routeInfo += ' > '
-                                    }
-                                } var codeBlock = `
-                                <form action="/OneMap" method="post">
+                        else {
+                            // console.log("False")
+                            if (data[0].indirect_flight_data.length > 0) {
 
+                                for (i = 0; i < data[0].indirect_flight_data.length; i++) {
+                                    var route = data[0].indirect_flight_data[i]
+                                    // console.log("---------------------------------------")
+                                    // console.log(route)
+                                    // console.log("---------------------------------------")
+                                    var routeInfo = ""
+                                    for (let j = 0; j < route[0].length; j++) {
+                                        // console.log(route[0][j])
+                                        routeInfo += route[0][j];
+                                        if (j < route[0][j].length - 1) {
+                                            routeInfo += ' > '
+                                        }
+                                    } var codeBlock = `
                                     <div class="card w-50 mb-2">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Source Airport: ${route[0][0]}</h5>
-                                            <h5 class="card-title">Destination Airport: ${route[0][1]}</h5>
-                                            <p class="card-text">Distance: ${route[1]} km</p>
-                                            <p class="card-text">Airline: ${route[2]} </p>
-                                            <p class="card-text">Price: $${route[3]} </p>
-                                            <p class="card-text">Route: ${routeInfo}</p>
-                                            <button type="submit" class="btn btn-primary">View More</button>
-                                        </div>
-                                    </div>
+                                        <form action="/OneMap" method="post">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Source Airport: ${route[0][0]}</h5>
+                                                <h5 class="card-title">Destination Airport: ${route[0][route[0].length - 1]}</h5>
+                                                <p class="card-text">Distance: ${route[1]} km</p>
+                                                <p class="card-text">Airline: ${route[2]} </p>
+                                                <p class="card-text">Price: $${route[3]} </p>
+                                                <p class="card-text">Route: ${routeInfo}</p>
+                                                <button type="submit" class="btn btn-primary">View More</button>
+                                            </div>
 
-                                    <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
-                                        readonly>
-                                    <p>
-                                        <label for="ETA">Estimated Time of Arrival</label>
-                                        <input type="text" style="visibility: visible;" id="ETA" name="ETA"
-                                            value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
-                                    </p>
+                                            <p>
+                                                <label for="ETA">Estimated Time of Arrival</label>
+                                                <input type="text" style="visibility: visible;" id="ETA" name="ETA"
+                                                    value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
+                                            </p>
 
-                                    <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[1]}" readonly>
+                                            <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance" value="${route[1]}"
+                                                readonly>
 
-
-                                        <input type="text" style="hidden: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
-                                    <p>
-                                        <label for="Flyover">Flyover</label>
-                                        <input type="text" style="visibility: visible;" id="Flyover" name="Flyover"
-                                            value="${route['flyover_coordinates']}" readonly>
-                                    </p>
-
-                                    <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
-                                    </form>`;
-                                output.innerHTML += codeBlock
+                                            <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate" value=${route_Coordinate[i + 1]} readonly>
+                                        </form>
+                                    </div>`;
+                                    output.innerHTML += codeBlock
+                                }
                             }
                         }
-                    }
-                }
-                )
+                    };
+                })
                 .catch(error => {
                     console.error('Error:', error);
                     // Handle error

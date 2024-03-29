@@ -279,6 +279,7 @@ def print_route_info(route_data, response_data, graph, printed_routes):
     route_tuple = tuple(route_data)
     direct_flights_data = []
     indirect_flights_data = []
+    
     if route_tuple not in printed_routes:
         printed_routes.add(route_tuple)
         unique_segments = set()
@@ -293,6 +294,7 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                     )
                 )
         sorted_segments = sorted(unique_segments, key=lambda x: x[3])
+        
         if len(route_data) == 2:
             for origin, destination in zip(route_data[:-1], route_data[1:]):
                 for segment in sorted_segments:
@@ -306,6 +308,7 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                             )
                         )
             return direct_flights_data
+        
         elif len(route_data) > 2:
             for i in range(len(route_data) - 1):
                 origin, destination = route_data[i], route_data[i + 1]
@@ -343,7 +346,7 @@ def get_country_coordinate_from_country(country):
                 longitude = float(row[5])
                 # Save the coordinates as a tuple
                 coordinate = (latitude, longitude)
-                print(f"{country} Coordinate:", coordinate)
+                # print(f"{country} Coordinate:", coordinate)
                 return coordinate
     return coordinate
 
