@@ -42,7 +42,8 @@
 <div class=" mt-3 mb-3">
     <div id="optimalRouteOutput"></div>
     <div id="output"></div>
-    <script>        document.addEventListener("DOMContentLoaded", function () {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("origin").addEventListener("input", function () {
                 // console.log("Input event fired origin");
                 var prefixValue = this.value;
@@ -133,11 +134,34 @@
                                     <p class="card-text">Distance: ${route[0][2]} km</p>
                                     <p class="card-text">Airline: ${route[0][1]} </p>
                                     <p class="card-text">Price: $${route[0][3]} </p>
-                                    <p class="card-text">Route: ${routeInfo}</p>                
-                                    <button type="submit" class="btn btn-primary">View More</button>                                
-                                    </div>
+                                    <p class="card-text">Route: ${routeInfo}</p>
+                                    <button type="submit" class="btn btn-primary">View More</button>
+                                </div>
                             </div>
+
+                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
+                                readonly>
+                            <p>
+                                <label for="ETA">Estimated Time of Arrival</label>
+                                <input type="text" style="visibility: visible;" id="ETA" name="ETA"
+                                    value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
+                            </p>
+
+                            <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[0][2]}"
+                                readonly>
+
+
+                                <input type="text" style="hidden: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
+                            <p>
+                                <label for="Flyover">Flyover</label>
+                                <input type="text" style="visibility: visible;" id="Flyover" name="Flyover"
+                                    value="${route['flyover_coordinates']}" readonly>
+                            </p>
+
+                            <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
                         </form>`;
+
+
                         optimalRouteOutput.innerHTML += codeBlock
                     } if (data[0].hasOwnProperty('direct_flight_data')) {
                         // console.log("True")
@@ -163,28 +187,24 @@
                                             <p class="card-text">Airline: ${route[2]} </p>
                                             <p class="card-text">Price: $${route[3]} </p>
                                             <p class="card-text">Route: ${routeInfo}</p>
-                                            <a href="#" class="btn btn-primary">View More</a>
+                                            <button type="submit" class="btn btn-primary">View More</button>
                                         </div>
                                     </div>
 
-                                    <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
-                                        readonly>
+                                    <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}" readonly>
                                     <p>
                                         <label for="ETA">Estimated Time of Arrival</label>
                                         <input type="text" style="visibility: visible;" id="ETA" name="ETA"
                                             value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
                                     </p>
 
-                                    <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[1]}"
-                                        readonly>
+                                    <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[1]}" readonly>
 
 
-                                    <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}"
-                                        readonly>
+                                        <input type="text" style="hidden: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
                                     <p>
                                         <label for="Flyover">Flyover</label>
-                                        <input type="text" style="visibility: visible;" id="Flyover" name="Flyover"
-                                            value="${route['flyover_coordinates']}" readonly>
+                                        <input type="text" style="visibility: visible;" id="Flyover" name="Flyover" value="${route['flyover_coordinates']}" readonly>
                                     </p>
 
                                     <input type="text" id="Dest" name="Dest" value="${flightCoordinates[1]}" style="visibility: hidden;" readonly>
@@ -214,6 +234,7 @@
                                     }
                                 } var codeBlock = `
                                 <form action="/OneMap" method="post">
+
                                     <div class="card w-50 mb-2">
                                         <div class="card-body">
                                             <h5 class="card-title">Source Airport: ${route[0][0]}</h5>
@@ -222,7 +243,7 @@
                                             <p class="card-text">Airline: ${route[2]} </p>
                                             <p class="card-text">Price: $${route[3]} </p>
                                             <p class="card-text">Route: ${routeInfo}</p>
-                                            <a href="#" class="btn btn-primary">View More</a>
+                                            <button type="submit" class="btn btn-primary">View More</button>
                                         </div>
                                     </div>
 
@@ -234,11 +255,10 @@
                                             value="${route['estimated_time_hours']} Hours ${route['estimated_time_minutes']} Mins" readonly>
                                     </p>
 
-                                    <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[1]}"
-                                        readonly>
+                                    <input type="text" style="visibility: visble;" id="totalDistance" name="totalDistance" value="${route[1]}" readonly>
 
 
-                                    <input type="text" style="hidden: hidden;" id="Source" name="Source" readonlyvalue="${flightCoordinates[0]}">
+                                        <input type="text" style="hidden: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
                                     <p>
                                         <label for="Flyover">Flyover</label>
                                         <input type="text" style="visibility: visible;" id="Flyover" name="Flyover"
