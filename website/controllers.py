@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, jsonify
 import heapq
 import csv
@@ -138,7 +137,6 @@ def dfs(graph, origin, destination, max_layovers, path, response_data, visited=N
     visited.remove(origin)
     return routes
 
-
 # Provided sorting functions
 def ascendingQuickSort(arr):
     if len(arr) <= 1:
@@ -213,7 +211,6 @@ def print_flight_routes(
 
     return direct_data, indirect_data
 
-
 def get_airline_and_cost_for_route(origin, destination, response_data):
     for itinerary in response_data:
         segments = itinerary["itineraries"][0]["segments"]
@@ -227,7 +224,6 @@ def get_airline_and_cost_for_route(origin, destination, response_data):
 
 
 # return the output instead of printing it
-
 
 def find_optimal_route(
     graph, direct_route, routes, response_data, airports, origin, destination
@@ -253,7 +249,6 @@ def find_optimal_route(
 
     return optimal_route
 
-
 def print_optimal_route(optimal_route, response_data, graph, airports):
     optimal_route_data = []
     if optimal_route:
@@ -274,7 +269,6 @@ def print_optimal_route(optimal_route, response_data, graph, airports):
         )
 
     return optimal_route_data
-
 
 # Function to handle each flight information
 def print_route_info(route_data, response_data, graph, printed_routes):
@@ -327,10 +321,9 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                         )
                         return indirect_flights_data
 
-#add-on (Amanda)
+# (Amanda) - Add On 
 
 # to calcualte distance between two points
-
 def calculate_estimated_time(distance):
     # Calculate estimated time based on average flight speed (Assuming 800 km/h)
     average_speed_kmh = 800
@@ -342,7 +335,7 @@ def calculate_estimated_time(distance):
 def get_country_coordinate_from_country(country):
     coordinate = None
 
-    with open('data/airports_Asia.csv', newline='', encoding='utf-8') as csvfile:
+    with open('website/data/airports_Asia.csv', newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             if row[3].strip().lower() == country.lower():  # Check if the country matches

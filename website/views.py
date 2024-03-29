@@ -8,6 +8,7 @@ from .controllers import (
     dfs,
     find_optimal_route,
     print_optimal_route,
+    get_country_coordinate_from_country,
 )
 import os
 from .trie import Trie
@@ -32,29 +33,6 @@ with open(csv_file_path, "r", encoding="utf-8") as f:
 def home():
     return render_template("home.html", user=current_user)
 
-@views.route('/OneMap', methods=['GET', 'POST'])
-def OneMap():
-    if request.method == 'POST':
-        source_coordinate = request.form.get('Source', default="Not Stated")
-        flyover_coordinates = request.form.get('Flyover', default="Not Stated")
-        dest_coordinate = request.form.get('Dest', default="Not Stated")
-        est_testimatedTime = request.form.get('ETA', default="Not Stated")
-        total_distance = request.form.get(
-            'totalDistance', default="Not Stated")
-        flight_routes = request.form.get('FlightRoutes', default="Not Stated")
-
-        return render_template('oneMap.html',
-                               source_coordinate=source_coordinate,
-                               flyover_coordinates=flyover_coordinates,
-                               dest_coordinate=dest_coordinate,
-                               totalDistance=total_distance,
-                               est_testimatedTime=est_testimatedTime,
-                               flight_routes=flight_routes)
-    else:
-        return render_template('oneMap.html')
-
-
-
 
 @views.route("/suggest", methods=["GET"])
 def suggest():
@@ -63,15 +41,48 @@ def suggest():
     return jsonify(suggestions)
 
 
+# Amanda) add on/improve function
+@views.route("/OneMap", methods=["GET", "POST"])
+def OneMap():
+    if request.method == "POST":
+        source_coordinate = request.form.get("Source", default="Not Stated")
+        flyover_coordinates = request.form.get("Flyover", default="Not Stated")
+        dest_coordinate = request.form.get("Dest", default="Not Stated")
+        est_testimatedTime = request.form.get("ETA", default="Not Stated")
+        total_distance = request.form.get("totalDistance", default="Not Stated")
+        flight_routes = request.form.get("FlightRoutes", default="Not Stated")
+
+        return render_template(
+            "oneMap.html",
+            source_coordinate=source_coordinate,
+            flyover_coordinates=flyover_coordinates,
+            dest_coordinate=dest_coordinate,
+            totalDistance=total_distance,
+            est_testimatedTime=est_testimatedTime,
+            flight_routes=flight_routes,
+        )
+    else:
+        return render_template("oneMap.html")
+
+
 @views.route("/get_route", methods=["POST"])
 def search_flights():
+    # get the fields from the form
     data = request.get_json()
-    origin = data.get("origin")
-    destination = data.get("destination")
+    origin = data.get("origin").upper()
+    destination = data.get("destination").upper()
     departure_date = data.get("departure_date")
     direct_flight = data.get("direct_flight")
     sortOrder = data.get("sortOrder")
 
+    # get source and destinatoin coordinate
+    flight_coordinates = []
+    source_coordinate = get_country_coordinate_from_country(origin)
+    dest_coordinate = get_country_coordinate_from_country(destination)
+
+    flight_coordinates.append(source_coordinate)
+    flight_coordinates.append(dest_coordinate)
+    print("flight_coordinates:", flight_coordinates)
     # Read airports data from CSV file
     current_dir = os.path.dirname(__file__)
 
@@ -120,13 +131,14 @@ def search_flights():
             optimal_route_data = print_optimal_route(
                 optimal_route, response_data, graph, airports
             )
-            print(
-                "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            )
+            # print(
+            #     "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            # )
 
             return jsonify(
                 {"direct_flight_data": direct_data},
                 {"optimal_route_data": optimal_route_data},
+                {"flight_coordinates": flight_coordinates},
             )
 
         else:
@@ -156,8 +168,9 @@ def search_flights():
             )
             # direct_data, _=()
             return jsonify(
-                {"indirect_flight_data": indirect_data},
+                {"indirect_flight_data": indirect_data },
                 {"optimal_route_data": optimal_route_data},
+                {"flight_coordinates": flight_coordinates},
             )
 
     else:
