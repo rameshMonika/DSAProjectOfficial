@@ -1,46 +1,46 @@
-def ascendingInsertionSort(arr):
+def ascendingInsertionSort(arr,index):
     for i in range(1,len(arr)):
         key = arr[i]
         j = i-1
-        while j >= 0 and key[1] < arr[j][1]:
+        while j >= 0 and key[index] < arr[j][index]:
             arr[j+1] = arr[j]
             j -= 1
         arr[j+1] = key
     return arr
 
-def descendingInsertionSort(arr):
+def descendingInsertionSort(arr,index):
     for i in range(1,len(arr)):
         key = arr[i]
         j = i-1
-        while j >= 0 and key[1] > arr[j][1]:
+        while j >= 0 and key[index] > arr[j][index]:
             arr[j+1] = arr[j]
             j -= 1
         arr[j+1] = key
     return arr
 
-def ascendingQuickSort(arr):
+def ascendingQuickSort(arr,index):
     if len(arr) <= 10:
         return ascendingInsertionSort(arr)
     # pivot set to median distance
-    pivot = arr[len(arr) // 2][1]
+    pivot = arr[len(arr) // 2][index]
     # left contains all elements with distance less than pivot
-    left = [x for x in arr if x[1] < pivot]
-    middle = [x for x in arr if x[1] == pivot]
+    left = [x for x in arr if x[index] < pivot]
+    middle = [x for x in arr if x[index] == pivot]
     # right contains all elements with distance greater than pivot
-    right = [x for x in arr if x[1] > pivot]
+    right = [x for x in arr if x[index] > pivot]
     # recursively sort left and right
-    return ascendingQuickSort(left) + middle + ascendingQuickSort(right)
+    return ascendingQuickSort(left,index) + middle + ascendingQuickSort(right,index)
 
-def descendingQuickSort(arr):
+def descendingQuickSort(arr,index):
     if len(arr) <= 10:
         return descendingInsertionSort(arr)
     # pivot set to median distance
-    pivot = arr[len(arr) // 2][1]
+    pivot = arr[len(arr) // 2][index]
     # left contains all elements with distance less than pivot
-    left = [x for x in arr if x[1] < pivot]
-    middle = [x for x in arr if x[1] == pivot]
+    left = [x for x in arr if x[index] < pivot]
+    middle = [x for x in arr if x[index] == pivot]
     # right contains all elements with distance greater than pivot
-    right = [x for x in arr if x[1] > pivot]
+    right = [x for x in arr if x[index] > pivot]
     # recursively sort left and right
     return descendingQuickSort(right) + middle + descendingQuickSort(left)
 
