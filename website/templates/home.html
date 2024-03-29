@@ -191,19 +191,22 @@
                         }
 
 
-                        var codeBlock = `<div class="card w-50 mb-2">
-                                    <div class="card-body">
-                                        <span class="badge badge-info">Best Optimal</span>
+                        var codeBlock = `
+                        <form action="/OneMap" method="post">
+                            <div class="card w-50 mb-2">
+                                <div class="card-body">
+                                    <span class="badge badge-info">Best Optimal</span>
                                     <h5 class="card-title">Source Airport: ${route[0][0][0]}</h5>
                                     <h5 class="card-title">Destination Airport: ${route[0][0][1]}</h5>
                                     <p class="card-text">Distance: ${route[0][2]} km</p>
                                     <p class="card-text">Airline: ${route[0][1]} </p>
                                     <p class="card-text">Price: $${route[0][3]} </p>
-                                    <p class="card-text">Route: ${routeInfo}</p>
+                                    <p class="card-text">Route: ${routeInfo}</p>                
+                                    <button type="submit" class="btn btn-primary">View More</button>
 
-                                    <a href="#" class="btn btn-primary">View More</a>
-                                    </div>
-                                    </div>`;
+                                </div>
+                            </div>
+                        </form>`;
 
 
                         optimalRouteOutput.innerHTML += codeBlock
