@@ -20,7 +20,7 @@ def descendingInsertionSort(arr,index):
 
 def ascendingQuickSort(arr,index):
     if len(arr) <= 10:
-        return ascendingInsertionSort(arr)
+        return ascendingInsertionSort(arr,index)
     # pivot set to median distance
     pivot = arr[len(arr) // 2][index]
     # left contains all elements with distance less than pivot
@@ -33,7 +33,7 @@ def ascendingQuickSort(arr,index):
 
 def descendingQuickSort(arr,index):
     if len(arr) <= 10:
-        return descendingInsertionSort(arr)
+        return descendingInsertionSort(arr,index)
     # pivot set to median distance
     pivot = arr[len(arr) // 2][index]
     # left contains all elements with distance less than pivot
