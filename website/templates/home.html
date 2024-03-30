@@ -159,6 +159,7 @@
                         }
 
                         console.log("Optimal total Distance: ", distance_direct);
+                        est_duration_com=est_duration[0]+" Hours "+ est_duration[1] +" Mins";
 
                         var codeBlock = `
                         <form action="/OneMap" method="post">
@@ -177,7 +178,7 @@
                                     <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
                                     <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
                                     <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}" readonly>
-                                    <input type="text" style="visibility: hidden;" id="ETA" name="ETA"value="${est_duration[0]} Hours ${est_duration[1]} Mins" readonly>
+                                    <input type="text" style="visibility: visible;" id="ETA" name="ETA"value="${est_duration_com}" readonly>
                                     <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance" value="${distance_direct}"readonly>
                                     <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate" value="${routeCoordinate}"readonly>
                                 </form>`;
@@ -270,8 +271,7 @@
                                                 readonly>
                                             <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
                                                 readonly>
-                                            <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${est_duration}" readonly>
-                                            <input type="text" style="visibility: hidden;" name="ETA" id="ETA" value="${indirectEstTime}" readonly>
+                                            <input type="text" style="visibility: visble;" name="ETA" id="ETA" value="${indirectEstTime}" readonly>
                                             <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance" value="${route[1]}"
                                                 readonly>
                                             <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate"
