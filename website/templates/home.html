@@ -159,6 +159,10 @@
                             distance_direct = data[1].optimal_route_data[0][2];
                         }
 
+                        console.log("Optimal Route Source Coord: ",data[2].flight_coordinates[0])
+                        console.log("Optimal Route Dest Coord ",data[2].flight_coordinates[1])
+
+
                         console.log("Optimal total Distance: ", distance_direct);
                         est_duration_com = est_duration[0] + " Hours " + est_duration[1] + " Mins";
 
@@ -176,17 +180,17 @@
                                     <button type="submit" class="btn btn-primary">View More</button>
                                 </div>
                             </div>
-                            <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
-                            <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}"
+                            <input type="text" style="visibility: visible;" id="Dest" name="Dest" value="${data[2].flight_coordinates[1]}" readonly>
+                            <input type="text" style="visibility: visible;" id="Source" name="Source" value="${data[2].flight_coordinates[0]}"
                                 readonly>
-                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
+                            <input type="text" style="visibility: visible;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
                                 readonly>
-                            <input type="text" style="visibility: hidden;" id="flightPrice" name="flightPrice" value="${route[0][3]}"
+                            <input type="text" style="visibility: visible;" id="flightPrice" name="flightPrice" value="${route[0][3]}"
                                 readonly>
-                            <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${est_duration_com}" readonly>
-                            <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance"
+                            <input type="text" style="visibility: visible;" id="ETA" name="ETA" value="${est_duration_com}" readonly>
+                            <input type="text" style="visibility: visible;" id="totalDistance" name="totalDistance"
                                 value="${distance_direct}" readonly>
-                            <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate"
+                            <input type="text" style="visibility: visible;" id="allCoordinate" name="allCoordinate"
                                 value="${routeCoordinate}" readonly>
                         </form>`;
 
@@ -228,15 +232,15 @@
                                         </div>
                                     </div>
 
-                                    <input type="text" style="visibility: hidden;" id="Source" name="Source"
+                                    <input type="text" style="visibility: visible;" id="Source" name="Source"
                                         value="${data[2].flight_coordinates[0]}" readonly>
-                                    <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${data[2].flight_coordinates[1]}"
+                                    <input type="text" style="visibility: visible;" id="Dest" name="Dest" value="${data[2].flight_coordinates[1]}"
                                         readonly>
-                                    <input type="text" style="visibility: hidden;" id="flightPrice" name="flightPrice" value="${route[3]}" readonly>
-                                    <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${directEstTime}" readonly>
-                                    <input type="text" style="visibility: hidden;" name="FlightRoutes" value="${routeInfo}" readonly>
-                                    <input type="text" style="visibility: hidden;" name="totalDistance" value="${route[1]}" readonly>
-                                    <input type="text" style="visibility: hidden;" name="allCoordinate" value="${data[2].flight_coordinates}"
+                                    <input type="text" style="visibility: visible;" id="flightPrice" name="flightPrice" value="${route[3]}" readonly>
+                                    <input type="text" style="visibility: visible;" id="ETA" name="ETA" value="${directEstTime}" readonly>
+                                    <input type="text" style="visibility: visible;" name="FlightRoutes" value="${routeInfo}" readonly>
+                                    <input type="text" style="visibility: visible;" name="totalDistance" value="${route[1]}" readonly>
+                                    <input type="text" style="visibility: visible;" name="allCoordinate" value="${data[2].flight_coordinates}"
                                         readonly>
                                 </form>
                                         `;
@@ -277,16 +281,16 @@
                                                     <button type="submit" class="btn btn-primary">View More</button>
                                                 </div>
                                             </div>
-                                            <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
-                                            <input type="text" style="visibility: hidden;" id="flightPrice" name="flightPrice" value="${route[3]}" readonly>
-                                            <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}"
+                                            <input type="text" style="visibility: visible;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
+                                            <input type="text" style="visibility: visible;" id="flightPrice" name="flightPrice" value="${route[3]}" readonly>
+                                            <input type="text" style="visibility: visible;" id="Source" name="Source" value="${flightCoordinates[0]}"
                                                 readonly>
-                                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
+                                            <input type="text" style="visibility: visible;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
                                                 readonly>
-                                            <input type="text" style="visibility: hidden;" name="ETA" id="ETA" value="${indirectEstTime}" readonly>
-                                            <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance" value="${route[1]}"
+                                            <input type="text" style="visibility: visible;" name="ETA" id="ETA" value="${indirectEstTime}" readonly>
+                                            <input type="text" style="visibility: visible;" id="totalDistance" name="totalDistance" value="${route[1]}"
                                                 readonly>
-                                            <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate"
+                                            <input type="text" style="visibility: visible;" id="allCoordinate" name="allCoordinate"
                                                 value="${route_Coordinate[y + 1]}" readonly>
                                         </form>`;
                                     }
