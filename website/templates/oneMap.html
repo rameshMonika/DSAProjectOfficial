@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Route Map</title>
+    <!-- Include Leaflet CSS and JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #map {
+            height: 740px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        #pointList {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #pointList a {
+            display: block;
+            margin-bottom: 5px;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        #pointList a:hover {
+            background-color: #0056b3;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            color: #007bff;
+            text-align: center;
+        }
+
+        .flight-detail {
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        /* Style for flight details */
+        #flightDetails,
+        #flightBook,
+        #flightBookContent {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        #flightDetails h3 {
+            color: #007bff;
+            text-align: center;
+        }
+
+        /* Style for flyover airports */
+        .flyover-airport {
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .flyover-airport:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="header">Flight Route Map</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <div id="map"></div>
+            </div>
+            <div class="col-md-4">
+
+
+                <div id="flightBookContent">
+                    <!-- Flight booking details will be populated here -->
+                </div>
+
+                <div id="flightDetails">
+                    <h3 class="header">Flight Details</h3>
+                    <div id="flightDetailsContent"></div>
+                </div>
+                <div id="pointList">
+                    <h3 class="header">Airports Stops</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var allCoordinates = "{{ allCoordinate }}";
+        var dest_coordinate = "{{ dest_coordinate }}";
+        var source_coordinate = "{{ source_coordinate }}";
+        var flyoverCoordinates = "{{ allCoordinate }}"; // Assuming flyoverCoordinates is the same as allCoordinate
+        var totalDistance = "{{ totalDistance }}";
+        var oneCountry = "{{ FlightRoutes }}";
+        var oneCountry_split = oneCountry.split(' &gt; ');
+        var flightPrice = "{{ flightPrice }}";
+        var estTime = "{{ estTime }}";
+
+        var destCoords = dest_coordinate.split(',').map(Number);
+        var sourceCoords = source_coordinate.split(',').map(Number);
+
+        console.log("allCoordinate: ", allCoordinates);
+        console.log("Number of Coordinates: ", destCoords.length / 2);
+        console.log("Total Distance: ", totalDistance);
+        console.log("Route: ", oneCountry);
+
+        var map = L.map('map').setView(destCoords, 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var sourceMarker = L.marker(sourceCoords)
+            .bindPopup(oneCountry_split[0])
+            .addTo(map);
+
+        var destMarker = L.marker(destCoords)
+            .bindPopup(oneCountry_split[oneCountry_split.length - 1])
+            .addTo(map);
+
+        var flyoverPairs = [];
+        if (flyoverCoordinates !== "") {
+            try {
+                flyoverPairs = flyoverCoordinates.split(',').map(function (coord) {
+                    return parseFloat(coord.trim());
+                }).reduce(function (accumulator, currentValue, index, array) {
+                    if (index % 2 === 0) accumulator.push([array[index], array[index + 1]]);
+                    return accumulator;
+                }, []);
+                if (flyoverPairs.length === 0) {
+                    var noFlyoverMsg = document.createElement('p');
+                    noFlyoverMsg.textContent = 'No flyover airports for this route.';
+                    document.getElementById('pointList').appendChild(noFlyoverMsg);
+                }
+
+                counter = 0;
+                flyoverPairs.forEach(function (coord, index) {
+                    var airportName = oneCountry_split[(index + 1) % oneCountry_split.length];
+                    var marker = L.marker(coord).addTo(map)
+                        .bindPopup('<b>' + airportName + '</b>');
+                    marker.on('click', function () {
+                        map.setView(marker.getLatLng(), 10);
+                    });
+                    var pointLink = document.createElement('a');
+                    pointLink.href = '#';
+                    pointLink.textContent = oneCountry_split[counter];
+                    pointLink.className = 'pointLink';
+                    pointLink.dataset.lat = coord[0];
+                    pointLink.dataset.lng = coord[1];
+                    document.getElementById('pointList').appendChild(pointLink);
+                    counter++;
+                });
+
+                for (var i = 0; i < flyoverPairs.length - 1; i++) {
+                    var flyoverPolyline = L.polyline([flyoverPairs[i], flyoverPairs[i + 1]], { color: 'blue' }).addTo(map);
+                }
+
+                var firstFlyover = flyoverPairs[0];
+                var sourceToFirstFlyoverPolyline = L.polyline([sourceCoords, firstFlyover], { color: 'blue' }).addTo(map);
+                var lastFlyover = flyoverPairs[flyoverPairs.length - 1];
+                var lastFlyoverToDestPolyline = L.polyline([lastFlyover, destCoords], { color: 'blue' }).addTo(map);
+            } catch (error) {
+                console.error('Error parsing flyover coordinates:', error);
+                console.log('Flyover coordinates value:', flyoverCoordinates);
+            }
+        } else {
+            var directPolyline = L.polyline([sourceCoords, destCoords], { color: 'blue' }).addTo(map);
+            var noFlyoverMsg = document.createElement('p');
+            noFlyoverMsg.textContent = 'No flyover airports for this route.';
+            document.getElementById('pointList').appendChild(noFlyoverMsg);
+        }
+
+        var bounds = new L.LatLngBounds([sourceCoords, destCoords]);
+        map.fitBounds(bounds);
+
+        document.querySelectorAll('.pointLink').forEach(function (pointLink) {
+            pointLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                var lat = parseFloat(this.dataset.lat);
+                var lng = parseFloat(this.dataset.lng);
+                map.setView([lat, lng], 11);
+            });
+        });
+
+        // Populate flight details
+        var flightDetailsContent = document.getElementById('flightDetailsContent');
+        var flightBookingContent = document.getElementById('flightBookContent');
+
+        var flightDetailsHTML = `
+            <div class="flight-detail">
+                <p class="detail-label">Route:</p>
+                <p class="detail-value">${oneCountry}</p>
+            </div>
+            <div class="flight-detail">
+                <p class="detail-label">Total Distance:</p>
+                <p class="detail-value">${totalDistance} km</p>
+            </div>
+            <div class="flight-detail">
+                <p class="detail-label">Estimated Time:</p>
+                <p class="detail-value">${estTime}</p>
+            </div>`;
+        flightDetailsContent.innerHTML = flightDetailsHTML;
+
+        // Populate flight booking details
+        var flightBookingHTML = `
+         <div class="flight-detail">
+            <h4 class="detail-label">Price: <span class="detail-value">$${flightPrice}</span></h4>
+            <form action="post">
+                <button type="button" class=" btn btn-primary btn-lg btn-block">Book Now</button>
+                </form>
+
+            </div>`;
+        flightBookingContent.innerHTML = flightBookingHTML;
+    </script>
+</body>
+
+</html>
