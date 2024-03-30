@@ -52,6 +52,8 @@ def OneMap():
         FlightRoutes = request.form.get("FlightRoutes", default="Not Stated")
         source_coordinate = request.form.get("Source", default="Not Stated")
         dest_coordinate = request.form.get("Dest", default="Not Stated")
+        flightPrice = request.form.get("flightPrice", default="Not Stated")
+
         
         print("======== PRINT DATA ========")
         print("allCoordinate", allCoordinate)
@@ -65,12 +67,12 @@ def OneMap():
         return render_template(
             "oneMap.html",
             totalDistance=total_distance,
-            est_testimatedTime=est_testimatedTime,
+            estTime=est_testimatedTime,
             FlightRoutes=FlightRoutes,
             allCoordinate=allCoordinate,
             source_coordinate=source_coordinate,
             dest_coordinate=dest_coordinate,
-
+            flightPrice=flightPrice
         )
     else:
         return render_template("oneMap.html")
@@ -85,7 +87,6 @@ def search_flights():
     departure_date = data.get("departure_date")
     direct_flight = data.get("direct_flight")
     sortOrder = data.get("sortOrder")
-
     # get source and destination coordinates
     flight_coordinates = []
     source_coordinate = get_country_coordinate_from_country(origin)

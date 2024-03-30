@@ -8,7 +8,7 @@ from amadeus import Client
 
 # Initialize Amadeus client
 amadeus = Client(
-    client_id="BxsFW8YgIcfqCGSiwk1GPvcJnttW266T", client_secret="WnFBmc33acG9bWHf"
+    client_id="RyTaBkUYFxBCMt1c5SIJX8jqhNqvCq81", client_secret="Xpi2SV5TFRBMTshT"
 )
 
 # Define helper functions
@@ -349,10 +349,12 @@ def print_route_info(route_data, response_data, graph, printed_routes):
 
 
 # to calcualte distance between two points
-def calculate_estimated_time(distance,):
+def calculate_estimated_time(
+    distance,
+):
     # Calculate estimated time based on average flight speed (Assuming 800 km/h)
     # add buffer_time of 1.5 hours
-    buffer_time=1.5
+    buffer_time = 1.5
     average_speed_kmh = 800
     estimated_time_hours = distance / average_speed_kmh
     estimated_time_minutes = (estimated_time_hours % 1) * 60
