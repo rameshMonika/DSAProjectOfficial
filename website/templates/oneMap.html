@@ -150,7 +150,7 @@
         console.log("Route: ", oneCountry);
 
 
-        console.log('destCoords',destCoords);
+        console.log('destCoords', destCoords);
         var map = L.map('map').setView(destCoords, 5);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -167,6 +167,7 @@
 
         var flyoverPairs = [];
         if (flyoverCoordinates !== "") {
+            console.log("flyoverCoordinates: ", flyoverCoordinates)
             try {
                 flyoverPairs = flyoverCoordinates.split(',').map(function (coord) {
                     return parseFloat(coord.trim());
@@ -180,9 +181,10 @@
                     document.getElementById('pointList').appendChild(noFlyoverMsg);
                 }
 
+                //addon line 184 - 200
                 counter = 0;
                 flyoverPairs.forEach(function (coord, index) {
-                    var airportName = oneCountry_split[(index + 1) % oneCountry_split.length];
+                    var airportName = oneCountry_split[counter];
                     var marker = L.marker(coord).addTo(map)
                         .bindPopup('<b>' + airportName + '</b>');
                     marker.on('click', function () {
@@ -190,13 +192,14 @@
                     });
                     var pointLink = document.createElement('a');
                     pointLink.href = '#';
-                    pointLink.textContent = oneCountry_split[counter];
+                    pointLink.textContent = airportName;
                     pointLink.className = 'pointLink';
                     pointLink.dataset.lat = coord[0];
                     pointLink.dataset.lng = coord[1];
                     document.getElementById('pointList').appendChild(pointLink);
-                    counter++;
+                    counter++; // Increment counter only when moving to the next airport name
                 });
+
 
                 for (var i = 0; i < flyoverPairs.length - 1; i++) {
                     var flyoverPolyline = L.polyline([flyoverPairs[i], flyoverPairs[i + 1]], { color: 'blue' }).addTo(map);
