@@ -4,26 +4,49 @@ import heapq
 weight_discount = 0.4
 weight_passengers = 0.6
 
+cached_scores = {}
+
 # Function to calculate weighted score
 def calculate_weighted_score(passengers, ticket_price, discount):
-    return (weight_discount * discount) + (weight_passengers * passengers)
+    # Check if the result is already cached
+    if (passengers, ticket_price, discount) in cached_scores:
+        return cached_scores[(passengers, ticket_price, discount)]
+    
+    # Calculate the weighted score
+    weighted_score = (weight_discount * discount) + (weight_passengers * passengers)
+    
+    # Cache the result
+    cached_scores[(passengers, ticket_price, discount)] = weighted_score
+    
+    return weighted_score
 
 passengers = int(input("Enter number of passengers: "))
 ticket_price = float(input("Enter ticket price: "))
 
-def display_top_vouchers(passengers, ticket_price, top_n=5):
+def display_top_usable_vouchers(passengers, ticket_price, top_n=5):
     ranked_vouchers = []
+    selected_vouchers = set()  
     for _, (p, tp, d) in enumerate(voucher_data):
-        if p >= passengers and tp >= ticket_price:
+        if p <= passengers and tp <= ticket_price:
             weighted_score = calculate_weighted_score(p, tp, d)
             heapq.heappush(ranked_vouchers, (-weighted_score, p, tp, d))
+            ranked_vouchers.append((-weighted_score, p, tp, d))
+
+    ranked_vouchers.sort()
 
     top_vouchers = []
-    for _ in range(min(top_n, len(ranked_vouchers))):
-        weighted_score, p, tp, d = heapq.heappop(ranked_vouchers)
-        top_vouchers.append((p, tp, d, -weighted_score))
+    for _, (weighted_score, p, tp, d) in enumerate(ranked_vouchers):
+        if len(top_vouchers) >= top_n:
+            break  # Stop once we have found the desired number of top vouchers
+
+        # Check if the voucher is already selected
+        if (p, tp, d) not in selected_vouchers:
+            savings = d / 100 * tp
+            top_vouchers.append((p, tp, d, -weighted_score, savings))
+            selected_vouchers.add((p, tp, d))
 
     return top_vouchers
+
 
 voucher_data = [
     (3, 200, 10),   # Voucher 1
@@ -40,7 +63,6 @@ voucher_data = [
     (3, 250, 15),   # Voucher 12
     (4, 200, 25),   # Voucher 13
     (5, 450, 20),   # Voucher 14
-    (6, 150, 30),   # Voucher 15
     (3, 300, 10),   # Voucher 16
     (7, 400, 15),   # Voucher 17
     (4, 350, 20),   # Voucher 18
@@ -59,7 +81,6 @@ voucher_data = [
     (3, 250, 15),   # Voucher 31
     (4, 200, 25),   # Voucher 32
     (5, 450, 20),   # Voucher 33
-    (6, 150, 30),   # Voucher 34
     (3, 300, 10),   # Voucher 35
     (7, 400, 15),   # Voucher 36
     (4, 350, 20),   # Voucher 37
@@ -78,7 +99,6 @@ voucher_data = [
     (3, 250, 15),   # Voucher 50
     (4, 200, 25),   # Voucher 51
     (5, 450, 20),   # Voucher 52
-    (6, 150, 30),   # Voucher 53
     (3, 300, 10),   # Voucher 54
     (7, 400, 15),   # Voucher 55
     (4, 350, 20),   # Voucher 56
@@ -116,7 +136,6 @@ voucher_data = [
     (3, 250, 15),   # Voucher 88
     (4, 200, 25),   # Voucher 89
     (5, 450, 20),   # Voucher 90
-    (6, 150, 30),   # Voucher 91
     (3, 300, 10),   # Voucher 92
     (7, 400, 15),   # Voucher 93
     (4, 350, 20),   # Voucher 94
@@ -139,7 +158,6 @@ voucher_data += [
     (3, 250, 15),   # Voucher 107
     (4, 200, 25),   # Voucher 108
     (5, 450, 20),   # Voucher 109
-    (6, 150, 30),   # Voucher 110
     (3, 300, 10),   # Voucher 111
     (7, 400, 15),   # Voucher 112
     (4, 350, 20),   # Voucher 113
@@ -158,7 +176,6 @@ voucher_data += [
     (3, 250, 15),   # Voucher 126
     (4, 200, 25),   # Voucher 127
     (5, 450, 20),   # Voucher 128
-    (6, 150, 30),   # Voucher 129
     (3, 300, 10),   # Voucher 130
     (7, 400, 15),   # Voucher 131
     (4, 350, 20),   # Voucher 132
@@ -177,7 +194,6 @@ voucher_data += [
     (3, 250, 15),   # Voucher 145
     (4, 200, 25),   # Voucher 146
     (5, 450, 20),   # Voucher 147
-    (6, 150, 30),   # Voucher 148
     (3, 300, 10),   # Voucher 149
     (7, 400, 15),   # Voucher 150
     (4, 350, 20),   # Voucher 151
@@ -196,7 +212,6 @@ voucher_data += [
     (3, 250, 15),   # Voucher 164
     (4, 200, 25),   # Voucher 165
     (5, 450, 20),   # Voucher 166
-    (6, 150, 30),   # Voucher 167
     (3, 300, 10),   # Voucher 168
     (7, 400, 15),   # Voucher 169
     (4, 350, 20),   # Voucher 170
@@ -215,7 +230,6 @@ voucher_data += [
     (3, 250, 15),   # Voucher 183
     (4, 200, 25),   # Voucher 184
     (5, 450, 20),   # Voucher 185
-    (6, 150, 30),   # Voucher 186
     (3, 300, 10),   # Voucher 187
     (7, 400, 15),   # Voucher 188
     (4, 350, 20),   # Voucher 189
@@ -236,8 +250,7 @@ voucher_data += [
 
 
 
-# Display the ranked vouchers
-top_vouchers = display_top_vouchers(passengers, ticket_price)
-print(f"Top 5 vouchers for {passengers} passengers and ticket price ${ticket_price}:")
-for i, (p, tp, d, ws) in enumerate(top_vouchers, start=1):
-    print(f"{i}. Passengers: {p}, Ticket Price: ${tp}, Discount: {d}%, Weighted Score: {ws}")
+top_usable_vouchers = display_top_usable_vouchers(passengers, ticket_price)
+print(f"Top 5 usable vouchers for {passengers} passengers and ticket price ${ticket_price}:")
+for idx, (p, tp, d, _, savings) in enumerate(top_usable_vouchers, start=1):
+    print(f"Voucher {idx}: Passengers: {p}, Ticket Price: ${tp}, Discount: {d}%, Savings: ${savings:.2f}")
