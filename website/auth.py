@@ -9,12 +9,11 @@ auth=Blueprint('auth',__name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    error_message = None
     if request.method == 'POST':
         print("Login request received")
         email = request.form.get('email')
         password = request.form.get('password')
-        print(email)
-        print(password)
         user = User.query.filter_by(email=email).first()
         if user:
             if check_password_hash(user.password, password):
@@ -22,7 +21,10 @@ def login():
                 login_user(user,remember=True)
                 return redirect(url_for('views.home'))
             else:
-                print("Incorrect credentials")
+                error_message = "Error Please Try Again."
+        else:
+            error_message = "Error Please Try Again."
+        return render_template("login.html", user=current_user, error_message=error_message)
 
 
              
@@ -42,6 +44,7 @@ def logout():
 def sign_up():
     print("Sign up request received")
     if request.method == 'POST':
+            error_message = None
             email = request.form.get('email')
             first_name = request.form.get('firstName')
             password1 = request.form.get('password1')
@@ -55,21 +58,31 @@ def sign_up():
             user = User.query.filter_by(email=email).first()
 
             if user:
+                 
+                 error_message = "Email already exists"
                  print("Email already exists")
-                 pass
+                 return render_template("sign_up.html", user=current_user, error_message=error_message)
 
             elif len(email)<4:
+                 error_message = "Incorrect email format"
                  print("Incorrect email format")
-                 #flash("Incorrect email format",category='error')
+                 return render_template("sign_up.html", user=current_user, error_message=error_message)
+                 
             elif len(first_name)<2:
+                 
+                 error_message = "Incorrect name format"
                  print("Incorrect name format")
-                 #flash("Incorrect name format",category='error')
+                 return render_template("sign_up.html", user=current_user, error_message=error_message)
             elif password1!=password2:
+                 
+                 error_message = "Passwords don\'t match"
                  print("Passwords don\'t match")
-                # flash("Passwords don\'t match ",category='error')
+                 return render_template("sign_up.html", user=current_user, error_message=error_message)
             elif len(password1)<6:
-                 print("Password does not meet requirement")
-                 #flash("Password does not meet requirement",category='error')
+                 
+                 error_message = "Password does not meet requirement of more than 6 characters"
+                 print("Password does not meet requirement of more than 6 characters")
+                 return render_template("sign_up.html", user=current_user, error_message=error_message)
             else:
                 
                  new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='scrypt'))

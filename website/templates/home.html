@@ -1,59 +1,191 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}{% block content %}
+{% block title %}Home{% endblock %}
 
-<h1>This is the home page</h1>
+{% block content %}
+
+
 <form id="routeForm">
+
+
+
     <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="origin">From:</label>
-            <input type="text" class="form-control suggestionField" list="suggestionsOrigin" id="origin"
-                placeholder="Enter origin"> <datalist id="suggestionsOrigin"></datalist><br>
+        <div class="form-group col-md-4">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fa fa-plane"></i> <!-- Assuming you're using Font Awesome for icons -->
+                    </span>
+                </div>
+                <input type="text" class="form-control suggestionField icon-input" list="suggestionsOrigin" id="origin"
+                    placeholder="From">
+            </div>
+            <datalist id="suggestionsOrigin"></datalist>
         </div>
-        <div class="form-group col-md-6">
-            <label for="source_Origin">To:</label>
-            <input type="text" class="form-control suggestionField" list="suggestionsOrigin" id="destination"
-                placeholder="Enter origin"> <datalist id="suggestionsDest"></datalist><br>
+
+
+
+        <div class="form-group col-md-4">
+
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fa fa-plane"></i> <!-- Assuming you're using Font Awesome for icons -->
+                    </span>
+                </div>
+                <input type="text" class="form-control suggestionField icon-input" list="suggestionsDest"
+                    id="destination" placeholder="To">
+            </div>
+            <datalist id="suggestionsDest"></datalist>
+        </div>
+
+        <div class="form-group col-md-3">
+
+            <div class="input-group">
+                <input type="date" class="form-control" id="departure_date" placeholder="Select Date" autocomplete="on">
+            </div>
+
+
+            <!-- <input type="date" class="form-control" id="departure_date"> -->
+        </div>
+        <div class="form-group col-md-1">
+
+            <div class="input-group">
+                <input type="hidden" id="sortOrder" name="sortOrder">
+                <button class="btn btn-outline-secondary" type="button" id="filterBtn">
+                    <i class="fa fa-filter"></i>
+                </button>
+            </div>
+            <br>
         </div>
     </div>
+    </div>
+    </div>
+
     <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="departure_date">Date of Departure:</label>
-            <input type="date" class="form-control" id="departure_date">
+
+
+
+
+
+
+
+
+        <div id="popover-content" style="display: none;">
+            <div class="list-group">
+                <button type="button" class="list-group-item list-group-item-action sort-option"
+                    data-value="ascending">Distance Ascending</button>
+                <button type="button" class="list-group-item list-group-item-action sort-option"
+                    data-value="descending">Distance Descending</button>
+                <button type="button" class="list-group-item list-group-item-action sort-option"
+                    data-value="ascendingPrice">Price Ascending</button>
+                <button type="button" class="list-group-item list-group-item-action sort-option"
+                    data-value="descendingPrice">Price Descending</button>
+            </div>
         </div>
-        <div class="form-group col-md-6">
-            <label for="sortOrder">Sort Order:</label>
-            <select class="form-control" id="sortOrder" name="sortOrder">
-                <option value="ascending">Distance Ascending</option>
-                <option value="descending">Distance Descending</option>
-            </select><br>
-        </div>
+
+
     </div>
-    <div class="col-sm-10">
-        <div class="form-check">
-            <input type="checkbox" id="direct_flight" name="direct_flight" value="true">
-            <label for="direct_flight">Direct Flight Only</label><br>
-        </div>
-    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="form-group row">
-        <div class="col-sm-10">
+        <div class="form-group col-md-10">
+            <div class="form-check">
+                <input type="checkbox" id="direct_flight" name="direct_flight" value="true">
+                <label for="direct_flight">Direct Flight Only</label><br>
+            </div>
+        </div>
+        <div class="form-group col-md-2">
             <button type="submit" class="btn btn-primary">Search</button>
         </div>
     </div>
+
+
+
+
 </form>
+
+
+
+
 <div class=" mt-3 mb-3">
-    <div id="optimalRouteOutput"></div>
-    <div id="output"></div>
+
+    <div id="allOutput">
+        <div id="optimalRouteOutput"></div>
+        <div id="output"></div>
+
+    </div>
+
+
     <script>
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+
+            document.getElementById("sortOrder").value = "ascending"
+
+            document.getElementById("filterBtn").addEventListener("click", function () {
+                // Show the popover
+                var filterBtn = this;
+                var popoverContent = document.getElementById("popover-content").innerHTML;
+                filterBtn.setAttribute("data-toggle", "popover");
+                filterBtn.setAttribute("data-content", popoverContent);
+                filterBtn.setAttribute("data-html", "true");
+                filterBtn.setAttribute("data-placement", "bottom");
+                $(filterBtn).popover('toggle');
+            });
+
+            // Update the hidden input field when an option is clicked
+            document.addEventListener("click", function (event) {
+                if (event.target.classList.contains("sort-option")) {
+                    var sortOrder = event.target.getAttribute("data-value");
+                    document.getElementById("sortOrder").value = sortOrder;
+                }
+            });
+        });
+
+
+        document.getElementById("sortOrder").addEventListener("change", function () {
+            var sortOrder = this.value;
+            // Update the hidden input field
+            document.getElementById("sortOrder").value = sortOrder;
+        });
+
+        document.addEventListener('click', function (event) {
+            var popover = document.getElementById('suggestionsOrigin');
+            var originInput = document.getElementById('origin');
+
+            // Check if the click target is inside the popover or the input field
+            if (!popover.contains(event.target) && event.target !== originInput) {
+                // If click is outside popover and input field, close the popover
+                popover.innerHTML = ''; // Clear popover content
+            }
+        });
+
+
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("origin").addEventListener("input", function () {
-                // console.log("Input event fired origin");
+                console.log("Input event fired origin");
                 var prefixValue = this.value;
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "/suggest?prefix=" + prefixValue, true);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == 4 && xhr.status == 200) {
                         var data = JSON.parse(xhr.responseText);
-                        // console.log(data)
+                        console.log(data)
                         var suggestionsElement2 = document.getElementById("suggestionsOrigin");
                         suggestionsElement2.innerHTML = ""; // Clear the datalist
                         data.forEach(function (suggestion) {
@@ -64,15 +196,17 @@
                     }
                 };
                 xhr.send();
-            }); document.getElementById("destination").addEventListener("input", function () {
-                // console.log("Input event fired dest");
+            });
+
+            document.getElementById("destination").addEventListener("input", function () {
+                console.log("Input event fired dest");
                 var prefixValue = this.value;
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "/suggest?prefix=" + prefixValue, true);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == 4 && xhr.status == 200) {
                         var data = JSON.parse(xhr.responseText);
-                        // console.log(data)
+                        console.log(data)
                         var suggestionsElement = document.getElementById("suggestionsDest");
                         suggestionsElement.innerHTML = ""; // Clear the datalist
                         data.forEach(function (suggestion) {
@@ -84,9 +218,41 @@
                 };
                 xhr.send();
             });
+
+
         });
+
         document.getElementById('routeForm').addEventListener('submit', function (event) {
             event.preventDefault();
+            var output = document.getElementById('output');
+            output.innerHTML = `<div class="card w-50 mb-2">
+    <div class="card-body">
+        <span class="badge badge-info">Best Optimal</span>
+        <h5 class="card-title skeleton-text"></h5>
+        <h5 class="card-title skeleton-text"></h5>
+        <p class="card-text skeleton-text"></p>
+        <p class="card-text skeleton-text"></p>
+        <p class="card-text skeleton-text"></p>
+        <p class="card-text skeleton-text"></p>
+        <a href="#" class="btn btn-primary skeleton-button"></a>
+    </div>
+</div>
+<div class="card w-50 mb-2">
+    <div class="card-body">
+        <h5 class="card-title skeleton-text"></h5>
+        <h5 class="card-title skeleton-text"></h5>
+        <p class="card-text skeleton-text"></p>
+        <p class="card-text skeleton-text"></p>
+        <p class="card-text skeleton-text"></p>
+        <p class="card-text skeleton-text"></p>
+        <a href="#" class="btn btn-primary skeleton-button"></a>
+    </div>
+</div>
+`;
+
+            var optimalRouteOutput = document.getElementById('optimalRouteOutput');
+            optimalRouteOutput.innerHTML = '';
+
             var form = event.target;
             var origin = form.elements.origin.value;
             var destination = form.elements.destination.value;
@@ -119,6 +285,11 @@
                     }
                     else if (data[0].direct_flight_data && data[0].direct_flight_data.length > 0) {
                         //direct
+                        console.log("********************************")
+                        console.log(data)
+                        console.log(data[2])
+                        console.log("********************************")
+
                         flightCoordinates = data[2].flight_coordinates[0];
                     }
 
@@ -163,15 +334,15 @@
                             destSource_Coordinate = data[2].flight_coordinates //add-on (30-March)
                         }
 
-                        console.log("Optimal Route Source Coord: ", destSource_Coordinate[0])
-                        console.log("Optimal Route Dest Coord ", destSource_Coordinate[1])
-
-
                         console.log("Optimal total Distance: ", distance_direct);
+                        console.log("________________________________")
+                        console.log(est_duration)
+                        console.log("________________________________")
+
                         est_duration_com = est_duration[0] + " Hours " + est_duration[1] + " Mins";
-                        console.log("Optimal Route", data)
+
                         var codeBlock = `
-                        <form action="/OneMap" method="post">
+                        
                             <div class="card w-50 mb-2">
                                 <div class="card-body">
                                     <span class="badge badge-info">Best Optimal</span>
@@ -181,21 +352,43 @@
                                     <p class="card-text">Distance: ${distance_direct} km</p>
                                     <p class="card-text">Price: $${route[0][3]} </p>
                                     <p class="card-text">Route: ${routeInfo}</p>
+                                    <form action="/OneMap" method="post">
                                     <button type="submit" class="btn btn-primary">View More</button>
-                                </div>
-                            </div>
-                            <input type="text" style="visibility: visible;" id="Dest" name="Dest" value="${routeCoordinate[1]}" readonly>  //add-on (30-March)
-                            <input type="text" style="visibility: visible;" id="Source" name="Source" value="${routeCoordinate[0]}" //add-on (30-March)
+                                    <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${routeCoordinate[1]}" readonly>
+                            <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${routeCoordinate[0]}"
                                 readonly>
-                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"readonly>
+                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
+                                readonly>
                             <input type="text" style="visibility: hidden;" id="flightPrice" name="flightPrice" value="${route[0][3]}"
                                 readonly>
                             <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${est_duration_com}" readonly>
                             <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance"
                                 value="${distance_direct}" readonly>
-                            <input type="text" style="visibility: visible;" id="allCoordinate" name="allCoordinate"
-                                value="${routeCoordinate}" readonly> //add-on (30-March)
-                        </form>`;
+                            <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate"
+                                value="${routeCoordinate}" readonly>
+                        </form>
+                                    <form method="POST" action="/bookFlights">
+                                    <input type="hidden" name="source_airport" value="${route[0][0][0]}">
+                                    <input type="hidden" name="destination_airport" value="${route[0][0][1]}">
+                                    <input type="hidden" name="distance" value="${route[0][2]}">
+                                    <input type="hidden" name="airline" value="${route[0][1]}">
+                                    <input type="hidden" name="route" value="${routeInfo}">
+                                    <input type="hidden" name="departure_date" value="${departureDate}">
+                                    <input type="hidden" name="ticket_price" value="${route[0][3]}">
+                                    <button type="submit" class="btn btn-primary book-now-btn">Book Now b</button>
+                                    </form>
+
+                                </div>
+                            </div>
+                            
+                        
+                                    
+                                   
+                                   
+                                    </div>
+                                    
+                                    
+                        `;
 
                         optimalRouteOutput.innerHTML += codeBlock;
                     }
@@ -222,7 +415,7 @@
                                 // console.log('One data', route)
 
                                 htmlContent += `
-                                <form action="/OneMap" method="post">
+                                
                                     <div class="card w-50 mb-2">
                                         <div class="card-body">
                                             <h5 class="card-title">Source Airport: ${route[0][0]}</h5>
@@ -231,12 +424,12 @@
                                             <p class="card-text">Airline: ${route[2]} </p>
                                             <p class="card-text">Price: $${route[3]} </p>
                                             <p class="card-text">Route: ${routeInfo}</p>
+                                            <form action="/OneMap" method="post">
                                             <button type="submit" class="btn btn-primary">View More</button>
-                                        </div>
-                                    </div>
-
-                                    <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${destSource_Coordinate[0]}" readonly> //add-on (30-March)
-                                    <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${destSource_Coordinate[1]}" //add-on (30-March)
+                                            
+                                    <input type="text" style="visibility: hidden;" id="Source" name="Source"
+                                        value="${destSource_Coordinate[0]}" readonly>
+                                    <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${destSource_Coordinate[1]}"
                                         readonly>
                                     <input type="text" style="visibility: hidden;" id="flightPrice" name="flightPrice" value="${route[3]}" readonly>
                                     <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${directEstTime}" readonly>
@@ -245,6 +438,14 @@
                                     <input type="text" style="visibility: hidden;" name="allCoordinate" value="${data[2].flight_coordinates}"
                                         readonly>
                                 </form>
+                                <form method="POST" action="/bookFlights">
+                                    <input type="hidden" name="ticket_price" value="${route[3]}">
+                                    <button type="submit" class="btn btn-primary book-now-btn">Book Now</button>
+                                    </form>
+
+                                        </div>
+                                    </div>
+
                                         `;
                                 counter += 1;
                                 output.innerHTML += htmlContent; // Append the HTML content
@@ -271,7 +472,7 @@
                                         // If not encountered, add it to the encountered classes set
                                         encounteredClasses[route[1]] = true;
                                         htmlContent += `
-                                        <form action="/OneMap" method="post">
+                                        
                                             <div class="card w-50 mb-2 ${route[1]}">
                                                 <div class="card-body">
                                                     <h5 class="card-title">Source Airport: ${route[0][0]}</h5>
@@ -280,10 +481,9 @@
                                                     <p class="card-text">Airline: ${route[2]} </p>
                                                     <p class="card-text">Price: $${route[3]} </p>
                                                     <p class="card-text">Route: ${routeInfo}</p>
+                                                    <form action="/OneMap" method="post">
                                                     <button type="submit" class="btn btn-primary">View More</button>
-                                                </div>
-                                            </div>
-                                            <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
+                                                    <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
                                             <input type="text" style="visibility: hidden;" id="flightPrice" name="flightPrice" value="${route[3]}" readonly>
                                             <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}"
                                                 readonly>
@@ -294,11 +494,18 @@
                                                 readonly>
                                             <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate"
                                                 value="${route_Coordinate[y + 1]}" readonly>
-                                        </form>`;
+                                        </form>
+                                        <form method="POST" action="/bookFlights">
+                                    <input type="hidden" name="ticket_price" value="${route[3]}">
+                                    <button type="submit" class="btn btn-primary book-now-btn">Book Now</button>
+                                    </form>
+                                                </div>
+                                            </div>
+                                           `;
                                     }
                                 }
                                 output.innerHTML += htmlContent; // Append the HTML content
-                            }h
+                            }
                         }
                     }
                 })
@@ -306,5 +513,61 @@
                     console.error('Error:', error);
                 });
         });
+
+
     </script>
+
+    <style>
+        div#allOutput {
+            margin-left: 5rem;
+        }
+
+        form#routeForm {
+            margin-top: 4em;
+        }
+
+        .input-group-text {
+            background-color: #fff !important;
+        }
+
+        input#origin,
+        input#destination {
+            border-left: 0px solid;
+        }
+
+        .form-check {
+            margin-left: 4em;
+        }
+
+        /* CSS Styles for Skeleton Loading Effect */
+        .skeleton-text {
+            width: 100%;
+            height: 16px;
+            /* Adjust height as needed */
+            background-color: #f0f0f0;
+            /* Light gray */
+            margin-bottom: 8px;
+            /* Adjust spacing between skeleton lines */
+        }
+
+        .skeleton-button {
+            width: 100px;
+            /* Adjust width as needed */
+            height: 32px;
+            /* Adjust height as needed */
+            background-color: #007bff;
+            /* Blue */
+            border: none;
+            border-radius: 4px;
+        }
+
+        p.errorMsg {
+            text-align: center;
+            font-size: 30px;
+            color: #dc828a;
+            margin-top: 4em;
+        }
+    </style>
+
+
     {% endblock %}

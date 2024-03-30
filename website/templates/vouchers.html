@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Usable Vouchers</title>
+</head>
+<body>
+    <script>
+           document.addEventListener("DOMContentLoaded", function () {
+            // Get the ticket price from the server-side template variable
+            var ticket_price = parseInt("{{ticket_price}}");
+            var source_airport = "{{source}}";
+            var destination_airport = "{{destination}}";
+            var departure_date = "{{departure_date}}";
+            var airline = "{{airline}}";
+            var route = "{{route}}";
+
+            console.log("Ticket price: " + ticket_price);
+            console.log("Source: " + source_airport);
+            console.log("Destination: " + destination_airport);
+            console.log("Departure Date: " + departure_date);
+            console.log("Airline: " + airline);
+            console.log("Route: " + route);
+
+            // Set the value of the ticket_price_value input box
+            // var ticketPriceInput = document.getElementById("ticket_price_value");
+            // if (ticketPriceInput) {
+
+            //     ticketPriceInput.value = ticket_price;
+            // } else {
+            //     console.error("Element with id 'ticket_price_value' not found.");
+            // }
+        });
+
+    </script>
+    <h1> Details of Flight</h1>
+    <p>From: {{ source }}</p>
+    <p>To: {{ destination }}</p>
+    <p>Departure Date: {{ departure_date }}</p>
+    <p>Airline: {{ airline }}</p>
+    <p>Route: {{ route }}</p>
+    
+    <h1>Top Usable Vouchers</h1>
+    <p>Passengers: {{ passengers }}</p>
+    <p>Ticket Price: {{ ticket_price }}</p>
+    <table>
+        <tr>
+            <th>Passengers</th>
+            <th>Ticket Price</th>
+            <th>Discount</th>
+            <th>Weighted Score</th>
+            <th>Savings</th>
+        </tr>
+        {% for voucher in vouchers %}
+        <tr>
+            <td>{{ voucher[0] }}</td>
+            <td>{{ voucher[1] }}</td>
+            <td>{{ voucher[2] }}</td>
+            <td>{{ voucher[3] }}</td>
+            <td>{{ voucher[4] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

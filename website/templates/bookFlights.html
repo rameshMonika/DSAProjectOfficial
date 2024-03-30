@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Form</title>
+</head>
+
+<body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get the ticket price from the server-side template variable
+            var ticket_price = "{{ticket_price}}";
+            var source_airport = "{{source}}";
+            var destination_airport = "{{destination}}";
+            var departure_date = "{{departure_date}}";
+            var airline = "{{airline}}";
+            var route = "{{route}}";
+
+            console.log("Ticket price: " + ticket_price);
+            console.log("Source: " + source_airport);
+            console.log("Destination: " + destination_airport);
+            console.log("Departure Date: " + departure_date);
+            console.log("Airline: " + airline);
+            console.log("Route: " + route);
+
+            // Set the value of the ticket_price_value input box
+            var ticketPriceInput = document.getElementById("ticket_price_value");
+            if (ticketPriceInput) {
+
+                ticketPriceInput.value = ticket_price;
+            } else {
+                console.error("Element with id 'ticket_price_value' not found.");
+            }
+        });
+
+
+
+    </script>
+    <h1> Details of Flight book</h1>
+    <p>From: {{ source }}</p>
+    <p>To: {{ destination }}</p>
+    <p>Departure Date: {{ departure_date }}</p>
+    <p>Airline: {{ airline }}</p>
+    <p>Route: {{ route }}</p>
+    
+    <h1>Enter Details</h1>
+    <form method="POST" method="POST" action="/display_vouchers">
+        <label for="passengers">Number of Passengers:</label>
+        <input type="number" id="passengers" name="passengers" required><br><br>
+        <label for="ticket_price">Ticket Price:</label>
+        <input type="number" id="ticket_price_value" name="ticket_price" step="0.01" required><br><br>
+        <input type="hidden" name="source" value="{{ source }}">
+        <input type="hidden" name="destination" value="{{ destination }}">
+        <input type="hidden" name="departure_date" value="{{ departure_date }}">
+        <input type="hidden" name="airline" value="{{ airline }}">
+        <input type="hidden" name="route" value="{{ route }}">
+      
+
+        <button type="submit">Submit</button>
+    </form>
+
+</body>
+
+</html>
