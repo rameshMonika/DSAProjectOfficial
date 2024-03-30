@@ -42,7 +42,7 @@ def suggest():
     return jsonify(suggestions)
 
 
-# Amanda) add on/improve function
+# (Amanda) add on/improve function
 @views.route("/OneMap", methods=["GET", "POST"])
 def OneMap():
     if request.method == "POST":
@@ -52,7 +52,16 @@ def OneMap():
         FlightRoutes = request.form.get("FlightRoutes", default="Not Stated")
         source_coordinate = request.form.get("Source", default="Not Stated")
         dest_coordinate = request.form.get("Dest", default="Not Stated")
-
+        
+        print("======== PRINT DATA ========")
+        print("allCoordinate", allCoordinate)
+        print("est_testimatedTime", est_testimatedTime)
+        print("total_distance", total_distance)
+        print("total_distance", total_distance)
+        print("FlightRoutes", FlightRoutes)
+        print("source_coordinate", source_coordinate)
+        print("dest_coordinate", dest_coordinate)
+        print("========================")
         return render_template(
             "oneMap.html",
             totalDistance=total_distance,
@@ -61,7 +70,7 @@ def OneMap():
             allCoordinate=allCoordinate,
             source_coordinate=source_coordinate,
             dest_coordinate=dest_coordinate,
-            
+
         )
     else:
         return render_template("oneMap.html")

@@ -121,7 +121,7 @@
                         flightCoordinates = data[2].flight_coordinates[0];
                     }
 
-                    console.log('Flight Coordinates', flightCoordinates);
+                    // console.log('Flight Coordinates', `);
 
                     var output = document.getElementById('output');
                     var optimalRouteOutput = document.getElementById('optimalRouteOutput');
@@ -161,8 +161,8 @@
                         console.log("Optimal total Distance: ", distance_direct);
 
                         var codeBlock = `
+                        <form action="/OneMap" method="post">
                             <div class="card w-50 mb-2">
-                                <form action="/OneMap" method="post">
                                     <div class="card-body">
                                         <span class="badge badge-info">Best Optimal</span>
                                         <h5 class="card-title">Source Airport: ${route[0][0][0]}</h5>
@@ -174,17 +174,13 @@
                                         <button type="submit" class="btn btn-primary">View More</button>
                                     </div>
                             </div>
-                            <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
-                            <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
-
-                            <input type="text" style="visibility: hidden;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}" readonly>
-                            <input type="text" style="visibility: hidden;" id="ETA" name="ETA"
-                                value="${est_duration[0]} Hours ${est_duration[1]} Mins" readonly>
-                            <input type="text" style="visibility: hidden;" id="totalDistance" name="totalDistance" value="${distance_direct}"
-                                readonly>
-                            <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate" value="${routeCoordinate}"
-                                readonly>
-                            </form>`;
+                                    <input type="text" style="visibility: visible;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
+                                    <input type="text" style="visibility: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
+                                    <input type="text" style="visibility: visible;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}" readonly>
+                                    <input type="text" style="visibility: visible;" id="ETA" name="ETA"value="${est_duration[0]} Hours ${est_duration[1]} Mins" readonly>
+                                    <input type="text" style="visibility: visible;" id="totalDistance" name="totalDistance" value="${distance_direct}"readonly>
+                                    <input type="text" style="visibility: visible;" id="allCoordinate" name="allCoordinate" value="${routeCoordinate}"readonly>
+                                </form>`;
 
                         optimalRouteOutput.innerHTML += codeBlock;
                     }
@@ -211,8 +207,8 @@
                                 // console.log('One data', route)
 
                                 htmlContent += `
+                                <form action="/OneMap" method="post">
                                         <div class="card w-50 mb-2">
-                                            <form action="/OneMap" method="post">
                                                 <div class="card-body">
                                                 <h5 class="card-title">Source Airport: ${route[0][0][0]}</h5>                                                                
                                                 <h5 class="card-title">Destination Airport: ${route[0][route[0].length - 1]}</h5>
@@ -222,15 +218,15 @@
                                                 <p class="card-text" >Route: ${routeInfo}</p>
                                                 <button type="submit" class="btn btn-primary">View More</button>
                                                 </div>
-                                            </div>
+                                        </div>
                                                
-                                                <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${data[2].flight_coordinates[0]}" readonly>
-                                                <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${data[2].flight_coordinates[1]}" readonly>
-                                                <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${directEstTime}" readonly>
-                                                <input type="text" style="visibility: hidden;" name="FlightRoutes" value="${routeInfo}" readonly>
-                                                <input type="text" style="visibility: hidden;" name="totalDistance" value="${route[1]}" readonly>
-                                                <input type="text" style="visibility: hidden;" name="allCoordinate" value="${data[2].flight_coordinates}" readonly>
-                                            </form>
+                                                <input type="text" style="visibility: visible;" id="Source" name="Source" value="${data[2].flight_coordinates[0]}" readonly>
+                                                <input type="text" style="visibility: visible;" id="Dest" name="Dest" value="${data[2].flight_coordinates[1]}" readonly>
+                                                <input type="text" style="visibility: visible;" id="ETA" name="ETA" value="${directEstTime}" readonly>
+                                                <input type="text" style="visibility: visible;" name="FlightRoutes" value="${routeInfo}" readonly>
+                                                <input type="text" style="visibility: visible;" name="totalDistance" value="${route[1]}" readonly>
+                                                <input type="text" style="visibility: visible;" name="allCoordinate" value="${data[2].flight_coordinates}" readonly>
+                                    </form>
                                         `;
                                 counter += 1;
                                 output.innerHTML += htmlContent; // Append the HTML content
@@ -257,8 +253,8 @@
                                         // If not encountered, add it to the encountered classes set
                                         encounteredClasses[route[1]] = true;
                                         htmlContent += `
-                                        <div class="card w-50 mb-2 ${route[1]}">
-                                            <form action="/OneMap" method="post">
+                                        <form action="/OneMap" method="post">
+                                            <div class="card w-50 mb-2 ${route[1]}">
                                                 <div class="card-body">
                                                     <h5 class="card-title">Source Airport: ${route[0][0]}</h5>
                                                     <h5 class="card-title">Destination Airport: ${route[0][route[0].length - 1]}</h5>
@@ -268,14 +264,19 @@
                                                     <p class="card-text">Route: ${routeInfo}</p>
                                                     <button type="submit" class="btn btn-primary">View More</button>
                                                 </div>
-                                                <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
-                                                <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
-                                                <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${indirectEstTime}" readonly>
-                                                <input type="text" style="visibility: hidden;" name="FlightRoutes" value="${routeInfo}" readonly>
-                                                <input type="text" style="visibility: hidden;" name="totalDistance" value="${route[1]}" readonly>
-                                                <input type="text" style="visibility: hidden;" name="allCoordinate" value="${route_Coordinate[y + 1]}" readonly>
-                                            </form>
-                                        </div>`;
+                                            </div>
+                                            <input type="text" style="visibility: visible;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
+                                            <input type="text" style="visibility: visible;" id="Source" name="Source" value="${flightCoordinates[0]}"
+                                                readonly>
+                                            <input type="text" style="visibility: visible;" id="FlightRoutes" name="FlightRoutes" value="${routeInfo}"
+                                                readonly>
+                                            <input type="text" style="visibility: visible;" id="ETA" name="ETA" value="${est_duration}" readonly>
+                                            <input type="text" style="visibility: visible;" name="ETA" id="ETA" value="${indirectEstTime}" readonly>
+                                            <input type="text" style="visibility: visible;" id="totalDistance" name="totalDistance" value="${route[1]}"
+                                                readonly>
+                                            <input type="text" style="visibility: visible;" id="allCoordinate" name="allCoordinate"
+                                                value="${route_Coordinate[y + 1]}" readonly>
+                                        </form>`;
                                     }
                                 }
                                 output.innerHTML += htmlContent; // Append the HTML content

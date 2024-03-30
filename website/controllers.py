@@ -349,13 +349,17 @@ def print_route_info(route_data, response_data, graph, printed_routes):
 
 
 # to calcualte distance between two points
-def calculate_estimated_time(distance):
+def calculate_estimated_time(distance,):
     # Calculate estimated time based on average flight speed (Assuming 800 km/h)
+    # add buffer_time of 1.5 hours
+    buffer_time=1.5
     average_speed_kmh = 800
     estimated_time_hours = distance / average_speed_kmh
     estimated_time_minutes = (estimated_time_hours % 1) * 60
-    return int(estimated_time_hours), int(estimated_time_minutes)
+    # Add buffer time
+    estimated_time_hours += buffer_time
 
+    return int(estimated_time_hours), int(estimated_time_minutes)
 
 
 def get_country_coordinate_from_country(country):
