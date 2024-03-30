@@ -278,6 +278,9 @@ def print_optimal_route(optimal_route, response_data, graph, airports):
     return optimal_route_data
 
 
+# (Amanda) - Add On
+
+
 # Function to handle each flight information
 def print_route_info(route_data, response_data, graph, printed_routes):
     total_distance = sum(
@@ -345,12 +348,9 @@ def print_route_info(route_data, response_data, graph, printed_routes):
                         return indirect_flights_data
 
 
-# (Amanda) - Add On
-
-
 # to calcualte distance between two points
-def calculate_estimated_time(distance)
-  # Calculate estimated time based on average flight speed (Assuming 800 km/h)
+def calculate_estimated_time(distance):
+    # Calculate estimated time based on average flight speed (Assuming 800 km/h)
     # add buffer_time of 1.5 hours
     buffer_time = 1.5
     average_speed_kmh = 800
@@ -358,10 +358,8 @@ def calculate_estimated_time(distance)
     estimated_time_minutes = (estimated_time_hours % 1) * 60
     # Add buffer time
     estimated_time_hours += buffer_time
-
     return int(estimated_time_hours), int(estimated_time_minutes)
-):
-    
+
 
 def get_country_coordinate_from_country(country):
     coordinate = None
