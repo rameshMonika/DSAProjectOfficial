@@ -129,6 +129,7 @@
                     optimalRouteOutput.innerHTML = ''; // Clear the optimalRouteOutput div
 
                     if (data[1].hasOwnProperty('optimal_route_data')) {
+                        console.log("Optimal Route Section");
                         var route = data[1].optimal_route_data;
                         var routeInfo = "";
 
@@ -155,7 +156,7 @@
                             distance_direct = data[1].optimal_route_data[2];
                         }
 
-                        console.log("est_duration", est_duration);
+                        // console.log("est_duration", est_duration);
 
                         var codeBlock = `
                                         <div class="card w-50 mb-2">
@@ -186,6 +187,8 @@
 
                     for (var i = 1; i < route_Coordinate.length; i += 2) {
                         if (data[0].hasOwnProperty('direct_flight_data')) {
+                            console.log("Direct Flight Section");
+
                             if (data[0].direct_flight_data.length > 0) {
                                 var htmlContent = "";
                                 for (var y = 0; y < data[0].direct_flight_data.length; y++) {
@@ -234,6 +237,8 @@
                             output.innerHTML += `<p>${data.error}</p>`;
                         } else {
                             if (data[0].indirect_flight_data.length > 0) {
+                                console.log("Indirect Flight Section");
+
                                 var htmlContent = "";
                                 for (var y = 0; y < data[0].indirect_flight_data.length; y++) {
                                     var indirectEstTime = data[0].indirect_flight_data[y][4][0] + " Hours " + data[0].indirect_flight_data[y][4][1] + " Mins";
@@ -257,20 +262,15 @@
                                                     <p class="card-text">Distance: ${route[1]} km</p>
                                                     <p class="card-text">Airline: ${route[2]} </p>
                                                     <p class="card-text">Price: $${route[3]} </p>
-                                                    <p class="card-text FlightRoutes"  name="FlightRoutes">Route: ${routeInfo}</p>
+                                                    <p class="card-text">Route: ${routeInfo}</p>
                                                     <button type="submit" class="btn btn-primary">View More</button>
                                                 </div>
                                                 <input type="text" style="visibility: hidden;" id="Dest" name="Dest" value="${flightCoordinates[1]}" readonly>
-                                                <input type="text" style="hidden: visible;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
-
-
-                                                <p>
-                                                    <label for="ETA">Estimated Time of Arrival</label>
-                                                    <input type="text" style="visibility: visible;" id="ETA" name="ETA" value="${indirectEstTime}" readonly>
-                                                </p>
-                                                <input type="text" style="visibility: visible;" name="FlightRoutes" value="${routeInfo}" readonly>
-                                                <input type="text" style="visibility: visible;" name="totalDistance" value="${route[1]}" readonly>
-                                                <input type="text" style="visibility: visible;" name="allCoordinate" value="${route_Coordinate[y + 1]}" readonly>
+                                                <input type="text" style="visibility: hidden;" id="Source" name="Source" value="${flightCoordinates[0]}" readonly>
+                                                <input type="text" style="visibility: hidden;" id="ETA" name="ETA" value="${indirectEstTime}" readonly>
+                                                <input type="text" style="visibility: hidden;" name="FlightRoutes" value="${routeInfo}" readonly>
+                                                <input type="text" style="visibility: hidden;" name="totalDistance" value="${route[1]}" readonly>
+                                                <input type="text" style="visibility: hidden;" name="allCoordinate" value="${route_Coordinate[y + 1]}" readonly>
                                             </form>
                                         </div>`;
                                     }
