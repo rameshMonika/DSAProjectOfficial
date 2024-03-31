@@ -4,63 +4,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Form</title>
+    <title>Flight Booking Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1,
+        h2 {
+            color: #007bff;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 
 <body>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Get the ticket price from the server-side template variable
-            var ticket_price = "{{ticket_price}}";
-            var source_airport = "{{source}}";
-            var destination_airport = "{{destination}}";
-            var departure_date = "{{departure_date}}";
-            var airline = "{{airline}}";
-            var route = "{{route}}";
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2><i class="fas fa-plane"></i> Flight Details</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="source">From:</label>
+                                    <p id="source">{{ source }}</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="destination">To:</label>
+                                    <p id="destination">{{ destination }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="departure_date">Departure Date:</label>
+                                    <p id="departure_date">{{ departure_date }}</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="airline">Airline:</label>
+                                    <p id="airline">{{ airline }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="route">Route:</label>
+                            <p id="route">{{ route }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2><i class="fas fa-user"></i> Enter Details</h2>
+                <form method="POST" action="/display_vouchers">
+                    <div class="form-group">
+                        <label for="passengers"><i class="fas fa-users"></i> Number of Passengers:</label>
+                        <input type="number" id="passengers" name="passengers" min="1" value="1" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="ticket_price"><i class="fas fa-dollar-sign"></i> Ticket Price:</label>
+                        <input type="number" id="ticket_price_value" name="ticket_price" value="{{ ticket_price }}" step="0.01" required class="form-control">
+                    </div>
+                    <input type="hidden" name="source" value="{{ source }}">
+                    <input type="hidden" name="destination" value="{{ destination }}">
+                    <input type="hidden" name="departure_date" value="{{ departure_date }}">
+                    <input type="hidden" name="airline" value="{{ airline }}">
+                    <input type="hidden" name="route" value="{{ route }}">
+                    <button type="submit" class="btn btn-primary"> Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-            console.log("Ticket price: " + ticket_price);
-            console.log("Source: " + source_airport);
-            console.log("Destination: " + destination_airport);
-            console.log("Departure Date: " + departure_date);
-            console.log("Airline: " + airline);
-            console.log("Route: " + route);
-
-            // Set the value of the ticket_price_value input box
-            var ticketPriceInput = document.getElementById("ticket_price_value");
-            if (ticketPriceInput) {
-
-                ticketPriceInput.value = ticket_price;
-            } else {
-                console.error("Element with id 'ticket_price_value' not found.");
-            }
-        });
-
-
-
-    </script>
-    <h1> Details of Flight book</h1>
-    <p>From: {{ source }}</p>
-    <p>To: {{ destination }}</p>
-    <p>Departure Date: {{ departure_date }}</p>
-    <p>Airline: {{ airline }}</p>
-    <p>Route: {{ route }}</p>
-    
-    <h1>Enter Details</h1>
-    <form method="POST" method="POST" action="/display_vouchers">
-        <label for="passengers">Number of Passengers:</label>
-        <input type="number" id="passengers" name="passengers" required><br><br>
-        <label for="ticket_price">Ticket Price:</label>
-        <input type="number" id="ticket_price_value" name="ticket_price" step="0.01" required><br><br>
-        <input type="hidden" name="source" value="{{ source }}">
-        <input type="hidden" name="destination" value="{{ destination }}">
-        <input type="hidden" name="departure_date" value="{{ departure_date }}">
-        <input type="hidden" name="airline" value="{{ airline }}">
-        <input type="hidden" name="route" value="{{ route }}">
-      
-
-        <button type="submit">Submit</button>
-    </form>
-
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>

@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top Usable Vouchers</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 </head>
+
 <body>
+
+
     <script>
-           document.addEventListener("DOMContentLoaded", function () {
+        var ticket_price = parseFloat("{{ticket_price}}").toFixed(2);
+        var passengers = parseInt("{{passengers}}");
+
+        document.addEventListener("DOMContentLoaded", function () {
             // Get the ticket price from the server-side template variable
             var ticket_price = parseInt("{{ticket_price}}");
             var source_airport = "{{source}}";
@@ -23,44 +34,249 @@
             console.log("Airline: " + airline);
             console.log("Route: " + route);
 
-            // Set the value of the ticket_price_value input box
-            // var ticketPriceInput = document.getElementById("ticket_price_value");
-            // if (ticketPriceInput) {
 
-            //     ticketPriceInput.value = ticket_price;
-            // } else {
-            //     console.error("Element with id 'ticket_price_value' not found.");
-            // }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Add click event listeners to all btn_apply_voucher buttons
+            var applyButtons = document.querySelectorAll('.btn_apply_voucher');
+            var ticketPrice = parseFloat(document.getElementById('ticketPrice').innerHTML).toFixed(2);
+            var noOfPassenger = parseInt(document.getElementById('noOfPassenger').innerHTML);
+            function calculateSubTotal() {
+                var subTotal = parseFloat(ticketPrice * passengers).toFixed(2);
+                document.getElementById('subTotal').textContent = subTotal;
+                return subTotal;
+            }
+
+            // Function to calculate total amount
+            function calculateTotal() {
+                var subTotal = parseFloat(document.getElementById('subTotal').textContent);
+                var discountPrice = parseFloat(document.getElementById('discountPrice').textContent);
+                var total = (subTotal - discountPrice).toFixed(2);
+                document.getElementById('totalAmount').textContent = total;
+            }
+
+            // Initial calculation when the page loads
+            calculateSubTotal();
+            calculateTotal();
+            console.log("ticket price" + ticketPrice);
+            console.log("no of passenger" + noOfPassenger);
+            applyButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+
+                    // Get the voucher discount price associated with the clicked button
+                    var discountPercentage = parseInt(this.closest('.coupon').querySelector('.voucherDiscountPrice').textContent);
+                    console.log("discount percentage" + discountPercentage);
+                    var discountPrice = ticketPrice * discountPercentage / 100 * noOfPassenger;
+                    console.log("discount price" + discountPrice);
+                    discountPrice = discountPrice.toFixed(2);
+                    // Update the discountPercentage element with the voucher discount price
+                    document.getElementById('discountPrice').textContent = discountPrice;
+                    var total = (ticketPrice * noOfPassenger - discountPrice).toFixed(2);
+                    document.getElementById('totalAmount').textContent = total;
+                });
+            });
+            var confirmationButton = document.getElementById('confirmBookingButton');
+            confirmationButton.addEventListener('click', function () {
+                console.log("confirm booking button clicked");
+                // Show confirmation modal
+                document.getElementById('confrimationOp').innerHTML = ` <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Booking Confirmed! Your ticket has been successfully booked.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+`;
+
+            });
         });
 
     </script>
-    <h1> Details of Flight</h1>
-    <p>From: {{ source }}</p>
-    <p>To: {{ destination }}</p>
-    <p>Departure Date: {{ departure_date }}</p>
-    <p>Airline: {{ airline }}</p>
-    <p>Route: {{ route }}</p>
-    
-    <h1>Top Usable Vouchers</h1>
-    <p>Passengers: {{ passengers }}</p>
-    <p>Ticket Price: {{ ticket_price }}</p>
-    <table>
-        <tr>
-            <th>Passengers</th>
-            <th>Ticket Price</th>
-            <th>Discount</th>
-            <th>Weighted Score</th>
-            <th>Savings</th>
-        </tr>
-        {% for voucher in vouchers %}
-        <tr>
-            <td>{{ voucher[0] }}</td>
-            <td>{{ voucher[1] }}</td>
-            <td>{{ voucher[2] }}</td>
-            <td>{{ voucher[3] }}</td>
-            <td>{{ voucher[4] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container-fluid">
+        <h2>Booking Confirmation</h2>
+        <div id="confrimationOp"></div>
+
+        <div class="container">
+
+
+            <!-- Main content -->
+            <div class="row mt-3">
+                <div class="col-lg-6">
+                    <div class="card mb-4 p-4">
+                        <div class="card-body">
+
+                            <table class="table table-borderless">
+                                <tbody>
+
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex mb-2">
+
+                                                <div class="flex-lg-grow-1 ms-3">
+                                                    <div class="detail-item">
+                                                        <span class="label">From:</span>
+                                                        <span class="value">{{ source }}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="label">To:</span>
+                                                        <span class="value">{{ destination }}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="label">Departure Date:</span>
+                                                        <span class="value">{{ departure_date }}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="label">Airline:</span>
+                                                        <span class="value">{{ airline }}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="label">Route:</span>
+                                                        <span class="value">{{ route }}</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </td>
+                                        <td id="noOfPassenger">{{ passengers }}</td>
+                                        <td class="text-end" id="ticketPrice">{{ticket_price}}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2">Subtotal</td>
+                                        <td class="text-end" id="subTotal">${{ticket_price * passengers}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">Discount</td>
+                                        <td class="text-danger text-end" id="discountPrice">0.00</td>
+                                    </tr>
+                                    <tr class="fw-bold">
+                                        <td colspan="2">TOTAL</td>
+                                        <td class="text-end" id="totalAmount">${{ticket_price * passengers}}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end mt-3 mb-3">
+                            <button type="button" class="btn btn-primary me-3" id="confirmBookingButton">Confirm
+                                Booking</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href = '/'">Back
+                                Home</button>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+                <div class="col-lg-6">
+                    <!-- Vouchers -->
+                    <div class="card mb-4 p-4">
+                        <div class="card-body">
+                            <h5 class="mb-3">Vouchers</h5>
+
+                            <div class="container">
+                                {% for voucher in vouchers %}
+                                <div class="coupon p-3 bg-light mb-3">
+                                    <div class="row no-gutters">
+                                        <div class="col-md-8 border-right">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="d-block">Minimum Passengers:</span>
+                                                <span class="text-black-50">{{ voucher[0] }}</span>
+                                                <span class="d-block mt-2">Minimum cost of a ticket:</span>
+                                                <span class="text-black-50">{{ voucher[1] }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex flex-row justify-content-end off">
+                                                <h2 class="voucherDiscountPrice text-danger">{{ voucher[2] }}</h2>
+                                                <span class="fs-4 text-danger">%OFF</span>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between off px-3 p-2">
+                                                <span
+                                                    class="border border-primary px-3 rounded code btn_apply_voucher">Apply
+                                                    Voucher</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                </div>
+                
+                
+               
+            </div>
+        </div>
+
+
+        <!-- Display message if no vouchers available -->
+        {% if not vouchers %}
+        <div class="container mt-5">
+            <div class="alert alert-info" role="alert">
+                No vouchers available at the moment.
+            </div>
+        </div>
+        {% endif %}
+
+
+
+
+
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
 </body>
+<style>
+    body {
+        background: #f8f9fa;
+    }
+
+    /* .d-flex.mt-3.mb-3 {
+        margin-left: 30em;
+    } */
+
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .coupon {
+        border-radius: 12px;
+        box-shadow: 5px 8px 10px #d6d5d533;
+        background-color: beige !important;
+    }
+
+    .code:hover {
+        background: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    button#confirmBookingButton {
+        margin-right: 2em;
+    }
+
+    h2 {
+        margin-left: 2.5em;
+        margin-top: 1em;
+    }
+</style>
+
 </html>
