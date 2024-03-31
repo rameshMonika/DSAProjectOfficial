@@ -331,17 +331,17 @@
                                                         <i class="fas fa-plane fa-2x"></i>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <p class="card-text"><strong>Destination:</strong> ${route[0][0][1]}</p>
+                                                        <p class="card-text"><strong>Destination: </strong> ${route[0][0][1]}</p>
                                                     </div>
                                                 </div>
                                                 <hr> <!-- Add a horizontal line -->
                                                 <div class="row align-items-center">
                                                     <div class="col-md-6">
-                                                        <p class="route-info"><strong>Estimated Duration:</strong><br>${est_duration_com}</p>
+                                                        <p class="route-info card-text"><strong>Estimated Duration:</strong><br>${est_duration_com}</p>
                                                         <p class="card-text"><strong>Airline:</strong><br>${route[0][1]} </p>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p class="card-text"><strong>Distance:</strong><br>${distance_direct}</p>
+                                                        <p class="card-text"><strong>Distance:</strong><br>${distance_direct} km</p>
                                                         <span class="badge badge-success route_price">$${route[0][3]}</span>
                                                     </div>
                                                 </div>
@@ -417,13 +417,13 @@
                                                                     <i class="fas fa-plane fa-2x"></i>
                                                                 </div>
                                                                 <div class="col-md-4">
-                                                                    <p class="card-text"><strong>Destination:</strong>${route[0][route[0].length - 1]}</p>
+                                                                    <p class="card-text"><strong>Destination: </strong>${route[0][route[0].length - 1]}</p>
                                                                 </div>
                                                             </div>
                                                             <hr> <!-- Add a horizontal line -->
                                                             <div class="row align-items-center">
                                                                 <div class="col-md-6">
-                                                                    <p class="route-info"><strong>Estimated Duration:</strong><br>${est_duration_com}</p>
+                                                                    <p class="route-info card-text"><strong>Estimated Duration:</strong><br>${directEstTime}</p>
                                                                     <p class="card-text"><strong>Airline:</strong><br>${route[2]} </p>
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -475,7 +475,7 @@
                                     console.log("Indirect Flight Section");
 
                                     var htmlContent = "";
-                                    for (var y = 0; y < data[0].indirect_flight_data.length; y++) {
+                                    for (var y = 1; y < data[0].indirect_flight_data.length; y++) {
                                         var indirectEstTime = data[0].indirect_flight_data[y][4][0] + " Hours " + data[0].indirect_flight_data[y][4][1] + " Mins";
                                         var route = data[0].indirect_flight_data[y];
                                         var routeInfo = "";
@@ -500,17 +500,17 @@
                                                                             <i class="fas fa-plane fa-2x"></i>
                                                                         </div>
                                                                         <div class="col-md-4">
-                                                                            <p class="card-text"><strong>Destination:</strong>${route[0][route[0].length - 1]}</p>
+                                                                            <p class="card-text"><strong>Destination: </strong>${route[0][route[0].length - 1]}</p>
                                                                         </div>
                                                                     </div>
                                                                     <hr> <!-- Add a horizontal line -->
                                                                     <div class="row align-items-center">
                                                                         <div class="col-md-6">
-                                                                            <p class="route-info"><strong>Estimated Duration:</strong><br>${est_duration_com}</p>
+                                                                            <p class="route-info card-text"><strong>Estimated Duration:</strong><br>${indirectEstTime}</p>
                                                                             <p class="card-text"><strong>Airline:</strong><br>${route[2]} </p>
                                                                         </div>
                                                                         <div class="col-md-6">
-                                                                            <p class="card-text"><strong>Distance:</strong><br>${route[1]}</p>
+                                                                            <p class="card-text"><strong>Distance:</strong><br>${route[1]} km</p>
                                                                             <span class="badge badge-success route_price">$${route[3]}</span>
                                                                         </div>
                                                                     </div>
@@ -557,7 +557,7 @@
                 })
                 .catch(error => {
                     document.getElementById('output').innerHTML = ` <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        Sorry Flights cannot be found!
+        Sorry Flights cannot be found! Service Provided for asian countries only.
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>

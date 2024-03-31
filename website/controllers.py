@@ -269,21 +269,30 @@ def getRouteCoordinate(flyover):
 
     return country_codes
 
-def calculate_estimated_time(distance):
+def calculate_estimated_time(route_data, distance):
+    # Determine the total number of stops in the route, including flyover stops
+    num_stops = len(route_data)
     
+    # Initialize buffer time
+    buffer_time = 0
 
-    # Calculate estimated time based on average flight speed (Assuming 800 km/h)
-    # add buffer_time of 1.5 hours
-    buffer_time = 1.5
-    average_speed_kmh = 800
-    estimated_time_hours = distance / average_speed_kmh
-    estimated_time_minutes = (estimated_time_hours % 1) * 60
-    # Add buffer time
-    estimated_time_hours += buffer_time
+    # Calculate buffer time based on the number of stops
+    if num_stops > 2:
+        # For routes with more than 2 stops, add buffer time for each additional stop beyond 2
+        buffer_time = 90 * (num_stops - 2)  # 90 minutes = 1.5 hours for each additional stop beyond 2
 
-    return int(estimated_time_hours), int(estimated_time_minutes)
+    # Calculate estimated flight time based on average flight speed (Assuming 880 km/h)
+    average_speed_kmh = 880
+    estimated_flight_time = distance / average_speed_kmh  # in hours
 
+    # Add buffer time to the estimated flight time
+    estimated_total_time = estimated_flight_time + buffer_time / 60  # Convert buffer time from minutes to hours
 
+    # Separate total time into hours and minutes
+    estimated_hours = int(estimated_total_time)
+    estimated_minutes = int((estimated_total_time - estimated_hours) * 60)
+
+    return estimated_hours, estimated_minutes
 
 
 
@@ -578,7 +587,7 @@ def print_route_info(route_data, response_data, graph, printed_routes):
     est_time = []
     # calculate time (in Minus &Hours)
     estimated_time_hours, estimated_time_minutes = calculate_estimated_time(
-        total_distance
+        route_data,total_distance
     )
     est_time.append(int(estimated_time_hours))
     est_time.append(int(estimated_time_minutes))
