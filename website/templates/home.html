@@ -556,7 +556,13 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    document.getElementById('output').innerHTML = ` <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Sorry Flights cannot be found!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+`;
                 });
         });
     </script>
