@@ -78,7 +78,7 @@
                 <label for="direct_flight">Direct Flight Only</label><br>
             </div>
         </div>
-       
+
     </div>
 </form>
 
@@ -90,56 +90,56 @@
 
 
     <script>
-       document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("sortOrder").value = "ascending";
-    var filterBtn = document.getElementById("filterBtn");
-    var popoverContent = document.getElementById("popover-content");
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("sortOrder").value = "ascending";
+            var filterBtn = document.getElementById("filterBtn");
+            var popoverContent = document.getElementById("popover-content");
 
-    filterBtn.addEventListener("click", function () {
-        // Toggle the display of the popover content
-        if (popoverContent.style.display === "none") {
-            // Show the popover
-            filterBtn.setAttribute("data-toggle", "popover");
-            filterBtn.setAttribute("data-content", popoverContent.innerHTML);
-            filterBtn.setAttribute("data-html", "true");
-            filterBtn.setAttribute("data-placement", "bottom");
-            $(filterBtn).popover('toggle');
-        } else {
-            // Hide the popover
-            $(filterBtn).popover('hide');
-        }
-    });
+            filterBtn.addEventListener("click", function () {
+                // Toggle the display of the popover content
+                if (popoverContent.style.display === "none") {
+                    // Show the popover
+                    filterBtn.setAttribute("data-toggle", "popover");
+                    filterBtn.setAttribute("data-content", popoverContent.innerHTML);
+                    filterBtn.setAttribute("data-html", "true");
+                    filterBtn.setAttribute("data-placement", "bottom");
+                    $(filterBtn).popover('toggle');
+                } else {
+                    // Hide the popover
+                    $(filterBtn).popover('hide');
+                }
+            });
 
-    // Update the hidden input field when an option is clicked
-    document.addEventListener("click", function (event) {
-        if (event.target.classList.contains("sort-option")) {
-            var sortOrder = event.target.getAttribute("data-value");
+            // Update the hidden input field when an option is clicked
+            document.addEventListener("click", function (event) {
+                if (event.target.classList.contains("sort-option")) {
+                    var sortOrder = event.target.getAttribute("data-value");
+                    document.getElementById("sortOrder").value = sortOrder;
+
+                    // Close the popover when a sort option is clicked
+                    $(filterBtn).popover('hide');
+                    // Hide the popover content
+                    popoverContent.style.display = "none";
+                }
+            });
+        });
+
+        document.getElementById("sortOrder").addEventListener("change", function () {
+            var sortOrder = this.value;
+            // Update the hidden input field
             document.getElementById("sortOrder").value = sortOrder;
+        });
 
-            // Close the popover when a sort option is clicked
-            $(filterBtn).popover('hide');
-            // Hide the popover content
-            popoverContent.style.display = "none";
-        }
-    });
-});
+        document.addEventListener('click', function (event) {
+            var popover = document.getElementById('popover-content');
+            var filterBtn = document.getElementById('filterBtn');
 
-document.getElementById("sortOrder").addEventListener("change", function () {
-    var sortOrder = this.value;
-    // Update the hidden input field
-    document.getElementById("sortOrder").value = sortOrder;
-});
-
-document.addEventListener('click', function (event) {
-    var popover = document.getElementById('popover-content');
-    var filterBtn = document.getElementById('filterBtn');
-
-    // Check if the click target is inside the popover, the filter button, or the sort option button
-    if (!popover.contains(event.target) && event.target !== filterBtn && !event.target.classList.contains("sort-option")) {
-        // If click is outside popover, filter button, and sort option buttons, close the popover
-        $(filterBtn).popover('hide');
-    }
-});
+            // Check if the click target is inside the popover, the filter button, or the sort option button
+            if (!popover.contains(event.target) && event.target !== filterBtn && !event.target.classList.contains("sort-option")) {
+                // If click is outside popover, filter button, and sort option buttons, close the popover
+                $(filterBtn).popover('hide');
+            }
+        });
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("origin").addEventListener("input", function () {
                 // console.log("Input event fired origin");
@@ -292,6 +292,7 @@ document.addEventListener('click', function (event) {
                         console.log("Optimal Route Section");
                         var route = data[1].optimal_route_data;
                         var routeInfo = "";
+                        console.log(data[1][0])
 
                         for (let j = 0; j < route[0][0].length; j++) {
                             routeInfo += route[0][0][j];
@@ -360,6 +361,7 @@ document.addEventListener('click', function (event) {
                                                 <div class="column  align-items-center mt-3"> 
                                                      <div class="text-center">
                                                         <form method="POST" action="/bookFlights" style="display: inline;">
+                                                            <input type="hidden" name="source_airport" value="${route[0][0][0]}">
                                                             <input type="hidden" name="destination_airport" value="${route[0][0][1]}">
                                                             <input type="hidden" name="distance" value="${route[0][2]}">
                                                             <input type="hidden" name="airline" value="${route[0][1]}">
@@ -445,6 +447,7 @@ document.addEventListener('click', function (event) {
                                                             <div class="column  align-items-center mt-3">
                                                                         <div class="text-center">                                                         
                                                                             <form method="POST" action="/bookFlights" style="display: inline;">
+                                                                                <input type="hidden" name="source_airport" value="${route[0][0]}">
                                                                         <input type="hidden" name="destination_airport" value="${route[0][route[0].length - 1]}">
                                                                         <input type="hidden" name="distance" value="${route[1]}">
                                                                         <input type="hidden" name="airline" value="${route[2]}">
@@ -627,7 +630,7 @@ document.addEventListener('click', function (event) {
         }
 
         /* add-on (Amanda) */
-    
+
         .route_price {
             padding: 10px 20px;
             font-size: 30px;
