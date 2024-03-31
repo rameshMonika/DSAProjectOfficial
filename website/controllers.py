@@ -231,7 +231,7 @@ def getRouteCoordinate(flyover):
         oneRoute = []
         for j in range(len(flyover[i])):
             oneRoute.append(get_country_coordinate_from_country(flyover[i][j]))
-            # print(f"oneRoute[{j}] {oneRoute[j]}")
+           
         country_codes.append(oneRoute)
 
     return country_codes
@@ -253,7 +253,7 @@ def get_country_coordinate_from_country(country):
                 longitude = float(row[5])
                 # Save the coordinates as a tuple
                 coordinate = (latitude, longitude)
-                # print(f"{country} Coordinate:", coordinate)
+             
                 return coordinate
     return coordinate
 
@@ -264,7 +264,7 @@ def getRouteCoordinate(flyover):
         oneRoute = []
         for j in range(len(flyover[i])):
             oneRoute.append(get_country_coordinate_from_country(flyover[i][j]))
-            # print(f"oneRoute[{j}] {oneRoute[j]}")
+          
         country_codes.append(oneRoute)
 
     return country_codes
@@ -488,13 +488,13 @@ def sort_by_distance(data, order):
     if order == 'ascending':
         return ascendingQuickSort(data,1)
     elif order == 'descending':
-        print("DESCENDING")
+        
         return descendingQuickSort(data,1)
     elif order == 'ascendingPrice':
-        print("ascendingPrice")
+       
         return ascendingQuickSort(data,3)
     elif order == 'descendingPrice':
-        print("descendingPrice")
+     
         return descendingQuickSort(data,3)
     #price is ,3
     else:
@@ -521,7 +521,7 @@ def print_flight_routes(graph, direct_route, routes, response_data, airports, or
                 if indirect_flight_info:
                     indirect_data.extend(indirect_flight_info)
          indirect_data = sort_by_distance(indirect_data, sort_order)
-         print(indirect_data)
+      
         
                    
 

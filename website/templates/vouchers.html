@@ -27,12 +27,7 @@
             var airline = "{{airline}}";
             var route = "{{route}}";
 
-            console.log("Ticket price: " + ticket_price);
-            console.log("Source: " + source_airport);
-            console.log("Destination: " + destination_airport);
-            console.log("Departure Date: " + departure_date);
-            console.log("Airline: " + airline);
-            console.log("Route: " + route);
+          
 
 
         });
@@ -59,16 +54,15 @@
             // Initial calculation when the page loads
             calculateSubTotal();
             calculateTotal();
-            console.log("ticket price" + ticketPrice);
-            console.log("no of passenger" + noOfPassenger);
+          
             applyButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
 
                     // Get the voucher discount price associated with the clicked button
                     var discountPercentage = parseInt(this.closest('.coupon').querySelector('.voucherDiscountPrice').textContent);
-                    console.log("discount percentage" + discountPercentage);
+                  
                     var discountPrice = ticketPrice * discountPercentage / 100 * noOfPassenger;
-                    console.log("discount price" + discountPrice);
+                   
                     discountPrice = discountPrice.toFixed(2);
                     // Update the discountPercentage element with the voucher discount price
                     document.getElementById('discountPrice').textContent = discountPrice;
@@ -78,7 +72,7 @@
             });
             var confirmationButton = document.getElementById('confirmBookingButton');
             confirmationButton.addEventListener('click', function () {
-                console.log("confirm booking button clicked");
+              
                 // Show confirmation modal
                 document.getElementById('confrimationOp').innerHTML = ` <div class="alert alert-success alert-dismissible fade show" role="alert">
         Booking Confirmed! Your ticket has been successfully booked.

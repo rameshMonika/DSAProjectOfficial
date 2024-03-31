@@ -108,6 +108,7 @@
 
 <body>
     <div class="container">
+        <div id="output"></div>
         <h1 class="header">Flight Route Map</h1>
         <div class="row">
             <div class="col-md-8">
@@ -210,8 +211,12 @@
                 var lastFlyover = flyoverPairs[flyoverPairs.length - 1];
                 var lastFlyoverToDestPolyline = L.polyline([lastFlyover, destCoords], { color: 'blue' }).addTo(map);
             } catch (error) {
-                console.error('Error parsing flyover coordinates:', error);
-                console.log('Flyover coordinates value:', flyoverCoordinates);
+                document.getElementById('output').innerHTML = ` <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Sorry Flights cannot be found! Service Provided for asian countries only.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>`;
             }
         } else {
             var directPolyline = L.polyline([sourceCoords, destCoords], { color: 'blue' }).addTo(map);

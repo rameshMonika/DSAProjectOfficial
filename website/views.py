@@ -45,10 +45,7 @@ def input_form_Result():
          passengers = int(request.form['passengers'])
         
          ticket_price = float(request.form['ticket_price'])
-         print("Source:", source)
-         print("Destination:", destination)
-         print("Departure Date:", departure_date)
-         
+        
          
          # Redirect to the route displaying top usable vouchers
          top_usable_vouchers = display_top_usable_vouchers(passengers, ticket_price)
@@ -67,12 +64,6 @@ def display_vouchers():
         route=request.form.get('route')
 
 
-        print("Data received from jkkk.html:", ticket_price)
-        print("Data received from jkkk.html:", source)
-        print("Data received from jkkk.html:", destination)
-        print("Data received from jkkk.html:", departure_date)
-        print("Data received from jkkk.html:", airline)
-        print("Data received from jkkk.html:", route)
         
        
         top_usable_vouchers = display_top_usable_vouchers(passengers, ticket_price)
@@ -93,13 +84,7 @@ def input_form():
         ticket_price = request.form.get('ticket_price')
        
         if ticket_price:
-            # Route to handle data submission from home.html
-            print("Data received from home.html:", ticket_price)
-            print("Data received from home.html:", source)
-            print("Data received from home.html:", destination)
-            print("Data received from home.html:", departure_date)
-            print("Data received from home.html:", airline)
-            print("Data received from home.html:", route)
+           
             return render_template('bookFlights.html',  ticket_price=ticket_price,source=source,destination=destination,departure_date=departure_date,airline=airline,route=route)
           
           
@@ -132,7 +117,7 @@ def search_flights():
 
     flight_coordinates.append(source_coordinate)
     flight_coordinates.append(dest_coordinate)
-    print("Source & Destination Coord:", flight_coordinates)
+
 
 
     # Read airports data from CSV file
@@ -164,9 +149,9 @@ def search_flights():
             direct_data, _ = print_flight_routes(graph, direct_route, [], response_data, airports, origin, destination,sort_order=sortOrder)
            # _, indirect_data=()
             optimal_route = find_optimal_route(graph, direct_route, [], response_data, airports, origin, destination)
-            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+            
             optimal_route_data=print_optimal_route(optimal_route, response_data, graph, airports)
-            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+          
 
             return jsonify({'direct_flight_data': direct_data},{'optimal_route_data':optimal_route_data},{'flight_coordinates': flight_coordinates})
 
@@ -175,11 +160,11 @@ def search_flights():
             
             _, indirect_data = print_flight_routes(graph, [], routes, response_data, airports, origin, destination,sort_order=sortOrder)
             optimal_route = find_optimal_route(graph, direct_route, [], response_data, airports, origin, destination)
-            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+          
             optimal_route_data=print_optimal_route(optimal_route, response_data, graph, airports)
-            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+   
             All_coordinates = getRouteCoordinate(routes)
-            print("Allcoordinates", All_coordinates)
+     
 
            # direct_data, _=()
             return jsonify({'indirect_flight_data': indirect_data},{'optimal_route_data':optimal_route_data}, {"Allcoordinates": All_coordinates})
@@ -199,15 +184,7 @@ def OneMap():
         flightPrice = request.form.get("flightPrice", default="Not Stated")
 
         
-        print("======== PRINT DATA ========")
-        print("allCoordinate", allCoordinate)
-        print("est_testimatedTime", est_testimatedTime)
-        print("total_distance", total_distance)
-        print("total_distance", total_distance)
-        print("FlightRoutes", FlightRoutes)
-        print("source_coordinate", source_coordinate)
-        print("dest_coordinate", dest_coordinate)
-        print("========================")
+    
         return render_template(
             "oneMap.html",
             totalDistance=total_distance,

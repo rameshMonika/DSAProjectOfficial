@@ -142,14 +142,14 @@
         });
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("origin").addEventListener("input", function () {
-                // console.log("Input event fired origin");
+               
                 var prefixValue = this.value;
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "/suggest?prefix=" + prefixValue, true);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == 4 && xhr.status == 200) {
                         var data = JSON.parse(xhr.responseText);
-                        // console.log(data)
+                  
                         var suggestionsElement2 = document.getElementById("suggestionsOrigin");
                         suggestionsElement2.innerHTML = ""; // Clear the datalist
                         data.forEach(function (suggestion) {
@@ -163,14 +163,14 @@
             });
 
             document.getElementById("destination").addEventListener("input", function () {
-                // console.log("Input event fired dest");
+             
                 var prefixValue = this.value;
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "/suggest?prefix=" + prefixValue, true);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == 4 && xhr.status == 200) {
                         var data = JSON.parse(xhr.responseText);
-                        // console.log(data)
+                      
                         var suggestionsElement = document.getElementById("suggestionsDest");
                         suggestionsElement.innerHTML = ""; // Clear the datalist
                         data.forEach(function (suggestion) {
@@ -266,22 +266,18 @@
                 .then(response => response.json())
                 .then(data => {
                     var flightCoordinate = "";
-                    // console.log(data);
+                  
                     if (data[0].indirect_flight_data && data[0].indirect_flight_data.length > 0) {
                         //indirect
                         flightCoordinates = data[2].Allcoordinates[0];
                     }
                     else if (data[0].direct_flight_data && data[0].direct_flight_data.length > 0) {
-                        //direct
-                        console.log("********************************")
-                        console.log(data)
-                        console.log(data[2])
-                        console.log("********************************")
+                     
 
                         flightCoordinates = data[2].flight_coordinates[0];
                     }
 
-                    // console.log('Flight Coordinates', `);
+                
 
                     var output = document.getElementById('output');
                     var optimalRouteOutput = document.getElementById('optimalRouteOutput');
@@ -289,10 +285,10 @@
                     optimalRouteOutput.innerHTML = ''; // Clear the optimalRouteOutput div
 
                     if (data[1].hasOwnProperty('optimal_route_data')) {
-                        console.log("Optimal Route Section");
+                        
                         var route = data[1].optimal_route_data;
                         var routeInfo = "";
-                        console.log(data[1][0])
+                  
 
                         for (let j = 0; j < route[0][0].length; j++) {
                             routeInfo += route[0][0][j];
@@ -323,10 +319,7 @@
                             destSource_Coordinate = data[2].flight_coordinates //add-on (30-March)
                         }
 
-                        // console.log("Optimal total Distance: ", distance_direct);
-                        // console.log("________________________________")
-                        // console.log(est_duration)
-                        // console.log("________________________________")
+                     
 
                         est_duration_com = est_duration[0] + " Hours " + est_duration[1] + " Mins";
 
@@ -401,11 +394,10 @@
                     for (var i = 1; i < route_Coordinate.length; i += 2) {
                         for (var i = 1; i < route_Coordinate.length; i += 2) {
                             if (data[0].hasOwnProperty('direct_flight_data')) {
-                                console.log("Direct Flight Section");
+                              
                                 counter = 1;
                                 while (data[0].direct_flight_data.length > 0 && counter < (data[0].direct_flight_data.length)) {
-                                    // console.log("direct flight data Counter: ", counter);
-                                    // console.log("data[0].direct_flight_data.length", data[0].direct_flight_data.length);
+                               
                                     var htmlContent = "";
                                     var directEstTime = data[0].direct_flight_data[counter][4][0] + " Hours " + data[0].direct_flight_data[counter][4][1] + " Mins";
                                     var route = data[0].direct_flight_data[counter];
@@ -416,7 +408,7 @@
                                             routeInfo += ' > ';
                                         }
                                     }
-                                    // console.log('One data', route)
+                                 
 
                                     htmlContent += ` <div class="card mb-3">
                                                         <div class="card-body text-center">
@@ -486,7 +478,7 @@
                                 output.innerHTML += `<p>${data.error}</p>`;
                             } else {
                                 if (data[0].indirect_flight_data.length > 0) {
-                                    console.log("Indirect Flight Section");
+                                   
 
                                     var htmlContent = "";
                                     for (var y = 1; y < data[0].indirect_flight_data.length; y++) {
@@ -557,6 +549,7 @@
                                                                                     value="${route[1]}" readonly>
                                                                                 <input type="text" style="visibility: hidden;" id="allCoordinate" name="allCoordinate"
                                                                                     value="${route_Coordinate[y + 1]}" readonly>
+                                                                                    </form>
                                                                         </div>
                                                                     </div>
                                                                 </div>
