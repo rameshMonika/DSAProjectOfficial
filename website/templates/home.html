@@ -90,46 +90,56 @@
 
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("sortOrder").value = "ascending";
-            document.getElementById("filterBtn").addEventListener("click", function () {
-                // Show the popover
-                var filterBtn = this;
-                var popoverContent = document.getElementById("popover-content").innerHTML;
-                filterBtn.setAttribute("data-toggle", "popover");
-                filterBtn.setAttribute("data-content", popoverContent);
-                filterBtn.setAttribute("data-html", "true");
-                filterBtn.setAttribute("data-placement", "bottom");
-                $(filterBtn).popover('toggle');
-            });
+       document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("sortOrder").value = "ascending";
+    var filterBtn = document.getElementById("filterBtn");
+    var popoverContent = document.getElementById("popover-content");
 
-            // Update the hidden input field when an option is clicked
-            document.addEventListener("click", function (event) {
-                if (event.target.classList.contains("sort-option")) {
-                    var sortOrder = event.target.getAttribute("data-value");
-                    document.getElementById("sortOrder").value = sortOrder;
-                }
-            });
-        });
+    filterBtn.addEventListener("click", function () {
+        // Toggle the display of the popover content
+        if (popoverContent.style.display === "none") {
+            // Show the popover
+            filterBtn.setAttribute("data-toggle", "popover");
+            filterBtn.setAttribute("data-content", popoverContent.innerHTML);
+            filterBtn.setAttribute("data-html", "true");
+            filterBtn.setAttribute("data-placement", "bottom");
+            $(filterBtn).popover('toggle');
+        } else {
+            // Hide the popover
+            $(filterBtn).popover('hide');
+        }
+    });
 
-        document.getElementById("sortOrder").addEventListener("change", function () {
-            var sortOrder = this.value;
-            // Update the hidden input field
+    // Update the hidden input field when an option is clicked
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("sort-option")) {
+            var sortOrder = event.target.getAttribute("data-value");
             document.getElementById("sortOrder").value = sortOrder;
-        });
 
-        document.addEventListener('click', function (event) {
-            var popover = document.getElementById('suggestionsOrigin');
-            var originInput = document.getElementById('origin');
+            // Close the popover when a sort option is clicked
+            $(filterBtn).popover('hide');
+            // Hide the popover content
+            popoverContent.style.display = "none";
+        }
+    });
+});
 
-            // Check if the click target is inside the popover or the input field
-            if (!popover.contains(event.target) && event.target !== originInput) {
-                // If click is outside popover and input field, close the popover
-                popover.innerHTML = ''; // Clear popover content
-            }
-        });
+document.getElementById("sortOrder").addEventListener("change", function () {
+    var sortOrder = this.value;
+    // Update the hidden input field
+    document.getElementById("sortOrder").value = sortOrder;
+});
 
+document.addEventListener('click', function (event) {
+    var popover = document.getElementById('popover-content');
+    var filterBtn = document.getElementById('filterBtn');
 
+    // Check if the click target is inside the popover, the filter button, or the sort option button
+    if (!popover.contains(event.target) && event.target !== filterBtn && !event.target.classList.contains("sort-option")) {
+        // If click is outside popover, filter button, and sort option buttons, close the popover
+        $(filterBtn).popover('hide');
+    }
+});
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("origin").addEventListener("input", function () {
                 // console.log("Input event fired origin");
